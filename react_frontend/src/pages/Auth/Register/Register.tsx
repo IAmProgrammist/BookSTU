@@ -4,6 +4,12 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 
+const NAME_PATTERN = /^[А-Яа-яЁёA-Za-z-]*$/
+const PASSPORT_PATTERN = /^[0-9]{10}$/
+const PHONE_PATTERN = /(^8|7|\+7)((\d{10})|(\s\(\d{3}\)\s\d{3}\s\d{2}\s\d{2}))/
+const EMAIL_PATTERN = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/
+const PASSWORD_PATTERN = /^.{6,}$/
+
 export function RegisterPage() {
     const navigate = useNavigate();
     const methods = useForm<{
@@ -19,6 +25,7 @@ export function RegisterPage() {
     const {
         control,
         formState: { errors },
+        getValues,
         trigger
     } = methods;
 
@@ -37,7 +44,7 @@ export function RegisterPage() {
                         message: "Слишком длинное значение"
                     },
                     pattern: {
-                        value: /[^А-Яа-яЁёA-Za-z-]/,
+                        value: NAME_PATTERN,
                         message: "Поле может содержать только кириллические, латинские символы и символ дефиса"
                     }
                 }}
@@ -62,7 +69,7 @@ export function RegisterPage() {
                         message: "Слишком длиннное значение"
                     },
                     pattern: {
-                        value: /[^А-Яа-яЁёA-Za-z-]/,
+                        value: NAME_PATTERN,
                         message: "Поле может содержать только кириллические, латинские символы и символ дефиса"
                     }
                 }}
@@ -86,7 +93,7 @@ export function RegisterPage() {
                         message: "Слишком длиннное значение"
                     },
                     pattern: {
-                        value: /[А-Яа-яЁёA-Za-z-]/,
+                        value: NAME_PATTERN,
                         message: "Поле может содержать только кириллические, латинские символы и символ дефиса"
                     }
                 }}
@@ -107,7 +114,7 @@ export function RegisterPage() {
                 rules={{
                     required: "Паспортные данные обязательны",
                     pattern: {
-                        value: /^[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]$/,
+                        value: PASSPORT_PATTERN,
                         message: "Введите серию и номер паспорта в формате 0123456789, где 0123 - серия паспорта, 456789 - номер паспорта"
                     }
                 }}
@@ -126,9 +133,9 @@ export function RegisterPage() {
                 name="phone"
                 control={control}
                 rules={{
-                    required: "Почта обязательна",
+                    required: "Номер телефона обязателен",
                     pattern: {
-                        value: /(^8|7|\+7)((\d{10})|(\s\(\d{3}\)\s\d{3}\s\d{2}\s\d{2}))/,
+                        value: PHONE_PATTERN,
                         message: "Номер телефона некорректный"
                     }
                 }}
@@ -149,7 +156,7 @@ export function RegisterPage() {
                 rules={{
                     required: "Почта обязательна",
                     pattern: {
-                        value: /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/,
+                        value: EMAIL_PATTERN,
                         message: "Почта некорректна"
                     }
                 }}
@@ -165,36 +172,45 @@ export function RegisterPage() {
                         required />
                 )} />
             <Controller
-                name="patronymic"
+                name="password"
                 control={control}
                 rules={{
-                    maxLength: {
-                        value: 50,
-                        message: "Слишком длиннное значение"
-                    },
                     pattern: {
-                        value: /[^А-Яа-яЁёA-Za-z-]/,
-                        message: "Поле может содержать только кириллические, латинские символы и символ дефиса"
+                        value: PASSWORD_PATTERN,
+                        message: "Длина пароля должна быть больше 6 символов"
                     }
                 }}
                 render={({ field: { value, onChange, ref } }) => (
-                    <TextField label="Пароль" type="password" required />
+                    <TextField
+                        label="Пароль"
+                        ref={ref}
+                        type="password"
+                        value={value}
+                        onChange={(ev: React.ChangeEvent<HTMLInputElement>) => onChange(ev.target.value)}
+                        error={!!errors?.password}
+                        helperText={`${errors?.password?.message || ""}`}
+                        required />
                 )} />
             <Controller
-                name="patronymic"
+                name="confirmPassword"
                 control={control}
                 rules={{
-                    maxLength: {
-                        value: 50,
-                        message: "Слишком длиннное значение"
-                    },
-                    pattern: {
-                        value: /[^А-Яа-яЁёA-Za-z-]/,
-                        message: "Поле может содержать только кириллические, латинские символы и символ дефиса"
+                    validate: () => {
+                        const values = getValues(["password", "confirmPassword"]);
+                        if (values[0] !== values[1]) return "Пароли не совпадают";
+                        return null;
                     }
                 }}
                 render={({ field: { value, onChange, ref } }) => (
-                    <TextField label="Подтверждение пароля" type="password" required />
+                    <TextField
+                        label="Потверждение пароля"
+                        ref={ref}
+                        type="password"
+                        value={value}
+                        onChange={(ev: React.ChangeEvent<HTMLInputElement>) => onChange(ev.target.value)}
+                        error={!!errors?.confirmPassword}
+                        helperText={`${errors?.confirmPassword?.message || "Повторите выше введённый пароль"}`}
+                        required />
                 )} />
         </FormProvider>
     </AuthWrapper>
