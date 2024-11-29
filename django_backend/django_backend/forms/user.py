@@ -17,3 +17,8 @@ class SignUpForm(UserCreationForm):
         fields = ('name', 'surname', 'patronymics',
                   'email', 'phone_number', 'password1',
                   'password2', 'passport_data' )
+
+
+class LoginForm(forms.Form):
+    login = forms.CharField()
+    password = forms.CharField()
