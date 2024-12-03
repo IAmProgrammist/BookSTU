@@ -84,7 +84,6 @@ def session_view(request):
         return JsonResponse({"message": "Unable to find profile"}, status=400)
     
     this_username = this_profile.name
-    print(this_username)
 
     return JsonResponse({'is_authenticated': True, 'username': this_profile.name, 'surname': this_profile.surname, 'patronymics': this_profile.patronymics,
                          'passport_data': this_profile.passport_data, 'phone_number': this_profile.phone_number, 'banned': this_profile.banned,
