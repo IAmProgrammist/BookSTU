@@ -5,8 +5,6 @@ from django.urls import re_path as url
 from django.contrib.auth.models import User
 import json
 
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 
@@ -68,15 +66,7 @@ def user_login(request):
         login(request, user)
         return JsonResponse({}, status=200)
 
-    return JsonResponse({"message": "User doesn't exists"}, status=400)
-
-
-@require_http_methods(["GET"])
-def dummy(request):
-    if request.user.is_authenticated:
-        return JsonResponse({"user": request.user.username}, status=400)
-    else:
-        return JsonResponse({"haha": "You are not user! >:)"}, status=200)    
+    return JsonResponse({"message": "User doesn't exists"}, status=400) 
 
 
 @ensure_csrf_cookie
@@ -87,7 +77,7 @@ def csrf_ensure(request):
 @require_http_methods(["GET"])
 def session_view(request):
     if not request.user.is_authenticated:
-        return JsonResponse({'isAuthenticated': False}, status=400)
+        return JsonResponse({'is_authenticated': False})
     
     this_profile = Profile.objects.get(user = request.user)
     if not this_profile:
@@ -96,7 +86,7 @@ def session_view(request):
     this_username = this_profile.name
     print(this_username)
 
-    return JsonResponse({'isAuthenticated': True, 'username': this_profile.name, 'surname': this_profile.surname, 'patronymics': this_profile.patronymics,
+    return JsonResponse({'is_authenticated': True, 'username': this_profile.name, 'surname': this_profile.surname, 'patronymics': this_profile.patronymics,
                          'passport_data': this_profile.passport_data, 'phone_number': this_profile.phone_number, 'banned': this_profile.banned,
                          'user_id': request.user.id}, status=200)
 
@@ -104,7 +94,6 @@ def session_view(request):
 urlpatterns = [
     url(r'^api/signup/$', user_signup, name='signup'),
     url(r'^api/login/$', user_login, name='login'),
-    url(r'^api/dummy/$', dummy, name='dummy'),
     url(r'^api/csrf/$', csrf_ensure, name='csrf_ensure'),
     url(r'^api/users/me/$', session_view, name='session_view'),
 ]
