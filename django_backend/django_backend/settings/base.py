@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "corsheaders",
     "rest_framework",
+    "django_backend.apps.BookSTUConfig"
 ]
 
 MIDDLEWARE = [

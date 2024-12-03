@@ -21,6 +21,22 @@
 1. [Useful Links](#useful_links)
 1. [Contributing](#contributing)
 
+Как накатывать миграции:
+Перезапускаете контейнер с изменениями в модели, после чего нужно сгенерить миграции на стороне контейнера. Для этого пишете в консоль:
+```
+docker-compose exec backend python3 manage.py makemigrations
+docker-compose exec backend python3 manage.py migrate
+```
+
+Вы сгенерируете миграцию и сразу же её примените в контейнере. 
+Теперь надо прорастить миграцию в хост. Для этого пишите:
+
+```
+docker cp ceci_aguilera_react_django_nginx_postgresql-backend-1:/usr/src/app/django_backend/migrations ./django_backend/django_backend
+```
+
+После этого в django_backend/django_backend обновится папка migrations с миграциями. Вот и всё.
+
 <a name="description"></a>
 ## Description
 
