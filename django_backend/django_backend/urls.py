@@ -21,8 +21,10 @@ from django.conf.urls.static import static
 from django.views.static import serve
 from django.conf.urls.static import static
 from django_backend.views.user import urlpatterns as user_urlpatterns
+from django_backend.views.file import urlpatterns as file_urlpatterns
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    *user_urlpatterns
+    *user_urlpatterns,
+    *file_urlpatterns
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -21,6 +21,11 @@ def upload_file(request):
 
     return JsonResponse({}, status=200)
 
+# @require_http_methods(["GET"])
+# def display_file(request):
+
+    
+
 
 
 urlpatterns = [
