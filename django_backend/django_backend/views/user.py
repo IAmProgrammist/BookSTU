@@ -7,6 +7,7 @@ import json
 
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
+from django.middleware.csrf import get_token
 
 from django_backend.models.user import Profile
 
@@ -69,21 +70,19 @@ def user_login(request):
     return JsonResponse({"message": "User doesn't exists"}, status=400) 
 
 
-@ensure_csrf_cookie
 def csrf_ensure(request):
-    return JsonResponse({"csrf": "Got csrf"}, status=200)
+    token = get_token(request)
+    return JsonResponse({"csrf": token}, status=200)
 
 
 @require_http_methods(["GET"])
 def session_view(request):
     if not request.user.is_authenticated:
         return JsonResponse({'is_authenticated': False})
-    
-    this_profile = Profile.objects.get(user = request.user)
+
+    this_profile = Profile.objects.get(user=request.user)
     if not this_profile:
         return JsonResponse({"message": "Unable to find profile"}, status=400)
-    
-    this_username = this_profile.name
 
     return JsonResponse({'is_authenticated': True, 'username': this_profile.name, 'surname': this_profile.surname, 'patronymics': this_profile.patronymics,
                          'passport_data': this_profile.passport_data, 'phone_number': this_profile.phone_number, 'banned': this_profile.banned,
