@@ -29,7 +29,7 @@ TEMPLATES_DIR = os.path.join(ROOT_BASE_DIR,'templates')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", "localhost:3000", "127.0.0.1:3000", "0.0.0.0:3000"]
 
 
 # Application definition

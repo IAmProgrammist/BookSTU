@@ -1,0 +1,34 @@
+{
+    "compilerOptions": {
+      /* Language and Environment */
+      "target": "ES6",
+       "jsx": "react",
+  
+      /* Modules */
+      "module": "ES6",   
+      "baseUrl": "src",
+  
+      /* JavaScript Support */
+      "allowJs": true,
+      "noEmit": true,
+      "esModuleInterop": true,
+      "forceConsistentCasingInFileNames": true,
+  
+      "strictNullChecks": false,
+      "stripInternal": true,
+      "declaration": true,
+      "importHelpers": true,
+      "moduleResolution": "node",
+      "sourceMap": false,
+      "noImplicitAny": false,
+      "removeComments": true,
+      "experimentalDecorators": true, 
+  
+      /* Type Checking */
+      // "strict": true,
+      "skipLibCheck": true,
+    },
+    "include": ["src"]
+  }
+  
+  

@@ -1,4 +1,4 @@
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.http import JsonResponse
 from django_backend.forms.user import SignUpForm, LoginForm
 from django.urls import re_path as url
@@ -75,6 +75,11 @@ def csrf_ensure(request):
     return JsonResponse({"csrf": token}, status=200)
 
 
+def user_logout(request):
+    logout(request)
+    return JsonResponse({})
+
+
 @require_http_methods(["GET"])
 def session_view(request):
     if not request.user.is_authenticated:
@@ -86,12 +91,13 @@ def session_view(request):
 
     return JsonResponse({'is_authenticated': True, 'username': this_profile.name, 'surname': this_profile.surname, 'patronymics': this_profile.patronymics,
                          'passport_data': this_profile.passport_data, 'phone_number': this_profile.phone_number, 'banned': this_profile.banned,
-                         'user_id': request.user.id}, status=200)
+                         'user_id': request.user.id, 'email': request.user.username}, status=200)
 
 
 urlpatterns = [
     url(r'^api/signup/$', user_signup, name='signup'),
     url(r'^api/login/$', user_login, name='login'),
+    url(r'^api/logout/$', user_logout, name='logout'),
     url(r'^api/csrf/$', csrf_ensure, name='csrf_ensure'),
     url(r'^api/users/me/$', session_view, name='session_view'),
 ]
