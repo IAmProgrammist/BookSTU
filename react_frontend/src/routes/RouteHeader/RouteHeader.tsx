@@ -57,7 +57,7 @@ export function RouteHeader({ isProtected }: RouteHeaderProps) {
                 <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                     {Object.entries(TITLE_MAP).find(([key, _]) => key === currentLocation.pathname)?.[1]?.(params)}
                 </Typography>
-                {!isAuthenticated ? <Button color="inherit" onClick={logoutNoRedirect}>Войти</Button> : <div>
+                {!isAuthenticated ? <Button color="inherit" onClick={logout}>Войти</Button> : <div>
                     <IconButton
                         size="large"
                         aria-label="account of current user"

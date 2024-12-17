@@ -3,6 +3,7 @@ import { AuthWrapper } from "../shared/AuthWrapper";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Controller, FormProvider, useForm } from "react-hook-form";
+import { useGetCSRFQuery } from "../../../redux/api/baseApi";
 
 const NAME_PATTERN = /^[А-Яа-яЁёA-Za-z-]*$/
 const PASSPORT_PATTERN = /^[0-9]{10}$/
@@ -11,6 +12,7 @@ const EMAIL_PATTERN = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/
 const PASSWORD_PATTERN = /^.{6,}$/
 
 export function RegisterPage() {
+    const {data} = useGetCSRFQuery({});
     const navigate = useNavigate();
     const methods = useForm<{
         name: string,

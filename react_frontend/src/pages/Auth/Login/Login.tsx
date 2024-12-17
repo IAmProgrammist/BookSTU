@@ -4,6 +4,7 @@ import { Button, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { LC_AUTH_CALLBACK } from "routes/RouteHeader";
+import { useGetCSRFQuery } from "../../../redux/api/baseApi";
 
 export function LoginPage() {
     const navigate = useNavigate();
@@ -15,6 +16,8 @@ export function LoginPage() {
         control,
         formState: { errors }
     } = methods;
+
+    const {data} = useGetCSRFQuery({});
 
     useEffect(() => {
         if (!localStorage.getItem(LC_AUTH_CALLBACK)) {
