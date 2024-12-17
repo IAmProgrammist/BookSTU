@@ -1,38 +1,71 @@
-import { Button, TextField } from "@mui/material";
+import { Button, InputAdornment, TextField } from "@mui/material";
 import { AuthWrapper } from "../shared/AuthWrapper";
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Controller, FormProvider, useForm } from "react-hook-form";
-import { useGetCSRFQuery } from "../../../redux/api/baseApi";
+import { useGetCSRFQuery, useSignupUserMutation } from "../../../redux/api/baseApi";
+import { useShowError } from "hooks/ShowError";
+import { LC_AUTH_CALLBACK } from "routes/RouteHeader";
 
 const NAME_PATTERN = /^[А-Яа-яЁёA-Za-z-]*$/
 const PASSPORT_PATTERN = /^[0-9]{10}$/
-const PHONE_PATTERN = /(^8|7|\+7)((\d{10})|(\s\(\d{3}\)\s\d{3}\s\d{2}\s\d{2}))/
+const PHONE_PATTERN = /^\d{10}$/
 const EMAIL_PATTERN = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/
 const PASSWORD_PATTERN = /^.{6,}$/
 
 export function RegisterPage() {
-    const {data} = useGetCSRFQuery({});
     const navigate = useNavigate();
     const methods = useForm<{
         name: string,
         surname: string,
-        patronymic: string,
-        passportData: string,
-        phone: string,
+        patronymics: string,
         email: string,
-        password: string,
-        confirmPassword: string
+        phone_number: string,
+        password1: string,
+        password2: string
+        passport_data: string,
     }>();
+
     const {
         control,
         formState: { errors },
         getValues,
-        trigger
+        handleSubmit
     } = methods;
 
+    const {
+        data: csrfData,
+        isSuccess: csrfIsSuccess
+    } = useGetCSRFQuery({});
+
+    const [signup, signupStatus] = useSignupUserMutation();
+
+    useEffect(() => {
+        if (!localStorage.getItem(LC_AUTH_CALLBACK)) {
+            localStorage.setItem(LC_AUTH_CALLBACK, `${window.location.origin}/home`);
+        }
+    }, []);
+
+    const onSave = (data) => {
+        signup({
+            ...data,
+            csrfmiddlewaretoken: csrfData.csrf
+        });
+    }
+
+    useShowError({
+        isError: signupStatus.isError,
+        error: signupStatus.error,
+        formMethods: methods
+    })
+
+    useEffect(() => {
+        if (!signupStatus.isSuccess) return;
+        navigate(localStorage.getItem(LC_AUTH_CALLBACK));
+    }, [signupStatus]);
+
     return <AuthWrapper title="Регистрация" actions={<>
-        <Button onClick={() => trigger()} variant="contained">Зарегистрироваться</Button>
+        <Button onClick={() => handleSubmit(onSave)()} variant="contained">Зарегистрироваться</Button>
         <Button onClick={() => navigate("/login")}>Войти</Button>
     </>}>
         <FormProvider {...methods}>
@@ -52,6 +85,7 @@ export function RegisterPage() {
                 }}
                 render={({ field: { value, onChange, ref } }) => (
                     <TextField
+                        id="surname"
                         label="Фамилия"
                         ref={ref}
                         type="text"
@@ -77,6 +111,7 @@ export function RegisterPage() {
                 }}
                 render={({ field: { value, onChange, ref } }) => (
                     <TextField
+                        id="name"
                         label="Имя"
                         ref={ref}
                         type="text"
@@ -87,7 +122,7 @@ export function RegisterPage() {
                         required />
                 )} />
             <Controller
-                name="patronymic"
+                name="patronymics"
                 control={control}
                 rules={{
                     maxLength: {
@@ -101,17 +136,18 @@ export function RegisterPage() {
                 }}
                 render={({ field: { value, onChange, ref } }) => (
                     <TextField
+                        id="patronymics"
                         label="Отчество"
                         ref={ref}
                         type="text"
                         value={value}
                         onChange={(ev: React.ChangeEvent<HTMLInputElement>) => onChange(ev.target.value)}
-                        error={!!errors?.patronymic}
-                        helperText={`${errors?.patronymic?.message || ""}`}
+                        error={!!errors?.patronymics}
+                        helperText={`${errors?.patronymics?.message || ""}`}
                         required />
                 )} />
             <Controller
-                name="passportData"
+                name="passport_data"
                 control={control}
                 rules={{
                     required: "Паспортные данные обязательны",
@@ -122,17 +158,18 @@ export function RegisterPage() {
                 }}
                 render={({ field: { value, onChange, ref } }) => (
                     <TextField
+                        id="passport_data"
                         label="Серия и номер паспорта"
                         ref={ref}
                         type="text"
                         value={value}
                         onChange={(ev: React.ChangeEvent<HTMLInputElement>) => onChange(ev.target.value)}
-                        error={!!errors?.passportData}
-                        helperText={`${errors?.passportData?.message || ""}`}
+                        error={!!errors?.passport_data}
+                        helperText={`${errors?.passport_data?.message || ""}`}
                         required />
                 )} />
             <Controller
-                name="phone"
+                name="phone_number"
                 control={control}
                 rules={{
                     required: "Номер телефона обязателен",
@@ -143,13 +180,19 @@ export function RegisterPage() {
                 }}
                 render={({ field: { value, onChange, ref } }) => (
                     <TextField
+                        id="phone_number"
                         label="Телефон"
+                        slotProps={{
+                            input: {
+                                startAdornment: <InputAdornment position="start">+7</InputAdornment>,
+                            },
+                        }}
                         ref={ref}
                         type="tel"
                         value={value}
                         onChange={(ev: React.ChangeEvent<HTMLInputElement>) => onChange(ev.target.value)}
-                        error={!!errors?.phone}
-                        helperText={`${errors?.phone?.message || ""}`}
+                        error={!!errors?.phone_number}
+                        helperText={`${errors?.phone_number?.message || ""}`}
                         required />
                 )} />
             <Controller
@@ -164,6 +207,7 @@ export function RegisterPage() {
                 }}
                 render={({ field: { value, onChange, ref } }) => (
                     <TextField
+                        id="email"
                         label="Почта"
                         ref={ref}
                         type="email"
@@ -174,7 +218,7 @@ export function RegisterPage() {
                         required />
                 )} />
             <Controller
-                name="password"
+                name="password1"
                 control={control}
                 rules={{
                     pattern: {
@@ -184,34 +228,36 @@ export function RegisterPage() {
                 }}
                 render={({ field: { value, onChange, ref } }) => (
                     <TextField
+                        id="password1"
                         label="Пароль"
                         ref={ref}
                         type="password"
                         value={value}
                         onChange={(ev: React.ChangeEvent<HTMLInputElement>) => onChange(ev.target.value)}
-                        error={!!errors?.password}
-                        helperText={`${errors?.password?.message || ""}`}
+                        error={!!errors?.password1}
+                        helperText={`${errors?.password1?.message || ""}`}
                         required />
                 )} />
             <Controller
-                name="confirmPassword"
+                name="password2"
                 control={control}
                 rules={{
                     validate: () => {
-                        const values = getValues(["password", "confirmPassword"]);
+                        const values = getValues(["password1", "password2"]);
                         if (values[0] !== values[1]) return "Пароли не совпадают";
                         return null;
                     }
                 }}
                 render={({ field: { value, onChange, ref } }) => (
                     <TextField
+                        id="password2"
                         label="Потверждение пароля"
                         ref={ref}
                         type="password"
                         value={value}
                         onChange={(ev: React.ChangeEvent<HTMLInputElement>) => onChange(ev.target.value)}
-                        error={!!errors?.confirmPassword}
-                        helperText={`${errors?.confirmPassword?.message || "Повторите выше введённый пароль"}`}
+                        error={!!errors?.password2}
+                        helperText={`${errors?.password2?.message || "Повторите выше введённый пароль"}`}
                         required />
                 )} />
         </FormProvider>

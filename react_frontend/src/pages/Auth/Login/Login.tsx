@@ -4,20 +4,27 @@ import { Button, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { LC_AUTH_CALLBACK } from "routes/RouteHeader";
-import { useGetCSRFQuery } from "../../../redux/api/baseApi";
+import { useGetCSRFQuery, useLoginUserMutation } from "../../../redux/api/baseApi";
+import { useShowError } from "hooks/ShowError";
 
 export function LoginPage() {
     const navigate = useNavigate();
     const methods = useForm<{
-        loginemail: string,
+        login: string,
         password: string
     }>();
     const {
         control,
-        formState: { errors }
+        formState: { errors },
+        handleSubmit
     } = methods;
 
-    const {data} = useGetCSRFQuery({});
+    const {
+        data: csrfData,
+        isSuccess: csrfIsSuccess
+    } = useGetCSRFQuery({});
+
+    const [login, loginStatus] = useLoginUserMutation();
 
     useEffect(() => {
         if (!localStorage.getItem(LC_AUTH_CALLBACK)) {
@@ -25,23 +32,48 @@ export function LoginPage() {
         }
     }, []);
 
+    useEffect(() => {
+        if (!loginStatus.isSuccess) return;
+
+        navigate(localStorage.getItem(LC_AUTH_CALLBACK));
+    }, [loginStatus]);
+
+    const onSave = (data) => {
+        login({
+            ...data,
+            csrfmiddlewaretoken: csrfData.csrf
+        })
+    }
+
+    useShowError({
+        isError: loginStatus.isError,
+        error: loginStatus.error,
+        formMethods: methods
+    })
+
+    useEffect(() => {
+        if (!loginStatus.isSuccess) return;
+        navigate(localStorage.getItem(LC_AUTH_CALLBACK));
+    }, [loginStatus]);
+
     return <AuthWrapper title="Вход" actions={<>
-        <Button onClick={() => localStorage.getItem(LC_AUTH_CALLBACK)} variant="contained">Войти</Button>
+        <Button onClick={() => handleSubmit(onSave)()} variant="contained">Войти</Button>
         <Button onClick={() => navigate("/register")}>Зарегистрироваться</Button>
     </>}>
         <FormProvider {...methods}>
             <Controller
-                name="loginemail"
+                name="login"
                 control={control}
                 render={({ field: { value, onChange, ref } }) => (
                     <TextField
+                        id="login"
                         label="Почта или номер телефона"
                         ref={ref}
                         type="email"
                         value={value}
                         onChange={(ev: React.ChangeEvent<HTMLInputElement>) => onChange(ev.target.value)}
-                        error={!!errors?.loginemail}
-                        helperText={`${errors?.loginemail?.message || ""}`}
+                        error={!!errors?.login}
+                        helperText={`${errors?.login?.message || ""}`}
                         required />
                 )} />
             <Controller
@@ -49,6 +81,7 @@ export function LoginPage() {
                 control={control}
                 render={({ field: { value, onChange, ref } }) => (
                     <TextField
+                        id="password"
                         label="Пароль"
                         ref={ref}
                         type="password"

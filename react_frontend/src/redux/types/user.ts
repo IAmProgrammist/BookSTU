@@ -22,10 +22,12 @@ export interface UserLoginQuery extends CSRFMiddlewareTokenQueryFormMixin {
     password: string
 }
 
-export interface UserAuthResponse {
-}
+export interface UserLogoutQuery {}
 
 export interface UserMeQuery {
+}
+
+export interface UserAuthResponse {
 }
 
 export interface UserMeResponse extends User {

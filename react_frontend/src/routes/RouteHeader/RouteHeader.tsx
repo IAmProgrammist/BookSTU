@@ -6,28 +6,29 @@ import { AppBar, Button, IconButton, Menu, MenuItem, Toolbar, Typography } from 
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { TITLE_MAP } from "routes";
+import { useGetUserMeQuery, useLogoutUserMutation } from "../../redux/api/baseApi";
 
 export function RouteHeader({ isProtected }: RouteHeaderProps) {
     const navigate = useNavigate();
-    const isAuthenticated = !!localStorage.getItem(LC_TOKEN);
 
-    const logout = useCallback(() => {
-        localStorage.removeItem(LC_TOKEN);
-        localStorage.setItem(LC_AUTH_CALLBACK, window.location.href);
-
-        navigate("/login");
-    }, [navigate]);
+    const { data: meData, isSuccess } = useGetUserMeQuery({});
+    const [logout, logoutStatus] = useLogoutUserMutation();
 
     const logoutNoRedirect = useCallback(() => {
-        localStorage.removeItem(LC_TOKEN);
-        window.location.reload();
+        logout({});
     }, [navigate]);
 
     useEffect(() => {
-        if (isProtected && !isAuthenticated) {
-            logout();
+        if (logoutStatus.isSuccess) {
+            navigate("/login");
         }
-    }, [isProtected, isAuthenticated, logout]);
+    }, [logoutStatus]);
+
+    useEffect(() => {
+        if (isProtected && isSuccess && !meData.is_authenticated) {
+            logout({});
+        }
+    }, [isProtected, meData, isSuccess, logout]);
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -57,7 +58,7 @@ export function RouteHeader({ isProtected }: RouteHeaderProps) {
                 <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                     {Object.entries(TITLE_MAP).find(([key, _]) => key === currentLocation.pathname)?.[1]?.(params)}
                 </Typography>
-                {!isAuthenticated ? <Button color="inherit" onClick={logout}>Войти</Button> : <div>
+                {!meData?.is_authenticated ? <Button color="inherit" onClick={logout}>Войти</Button> : <div>
                     <IconButton
                         size="large"
                         aria-label="account of current user"

@@ -1,16 +1,17 @@
 import { fetchBaseQuery } from "@reduxjs/toolkit/query";
-import { BACKEND_BASE_URL } from "envconsts";
+import { ENV_API_SERVER, DEBUG } from "envconsts";
 import { LC_AUTH_CALLBACK } from "routes/RouteHeader";
 
 const redirectLoginOn401Query = (apiPrefix = '/api') => async (args, api, extraOptions) => {
-    let baseUrl = BACKEND_BASE_URL;
+    let baseUrl = ENV_API_SERVER;
     if (apiPrefix)
         baseUrl += apiPrefix;
     const baseQuery = fetchBaseQuery({
         baseUrl,
         prepareHeaders: (headers) => {
             return headers
-        }
+        },
+        mode: DEBUG ? "no-cors" : "cors"
     });
     let result = await baseQuery(args, api, extraOptions);
     if (result.error?.status === 'FETCH_ERROR') {
@@ -19,7 +20,7 @@ const redirectLoginOn401Query = (apiPrefix = '/api') => async (args, api, extraO
     }
     if (result.error?.status === 401) {
         localStorage.setItem(LC_AUTH_CALLBACK, window.location.href);
-        window.location.href = `${BACKEND_BASE_URL}/login`;
+        window.location.href = `${ENV_API_SERVER}/login`;
 
         return result;
     }

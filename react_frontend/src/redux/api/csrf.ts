@@ -5,7 +5,7 @@ import { CSRFQuery, CSRFResponse } from "redux/types/csrf";
 
 export const endpoints = (builder: BaseApiBuilder) => ({
     getCSRF: builder.query<CSRFResponse, CSRFQuery>({
-        query: withQueryParams(`/csrf/`, {}),
+        query: () => withQueryParams(`/csrf/`, {}),
         providesTags: () => [
             QUERY_TAGS.CSRF
         ]
