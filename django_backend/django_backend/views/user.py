@@ -86,7 +86,7 @@ def session_view(request):
 
     return JsonResponse({'is_authenticated': True, 'username': this_profile.name, 'surname': this_profile.surname, 'patronymics': this_profile.patronymics,
                          'passport_data': this_profile.passport_data, 'phone_number': this_profile.phone_number, 'banned': this_profile.banned,
-                         'user_id': request.user.id}, status=200)
+                         'user_id': request.user.id, 'email': request.user.username}, status=200)
 
 
 urlpatterns = [

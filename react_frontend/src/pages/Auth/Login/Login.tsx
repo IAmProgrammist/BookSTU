@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { AuthWrapper } from "../shared/AuthWrapper";
 import { Button, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Controller, FormProvider, useForm } from "react-hook-form";
+import { LC_AUTH_CALLBACK } from "routes/RouteHeader";
 
 export function LoginPage() {
     const navigate = useNavigate();
@@ -15,8 +16,14 @@ export function LoginPage() {
         formState: { errors }
     } = methods;
 
+    useEffect(() => {
+        if (!localStorage.getItem(LC_AUTH_CALLBACK)) {
+            localStorage.setItem(LC_AUTH_CALLBACK, `${window.location.origin}/home`);
+        }
+    }, []);
+
     return <AuthWrapper title="Вход" actions={<>
-        <Button onClick={() => navigate("/home")} variant="contained">Войти</Button>
+        <Button onClick={() => localStorage.getItem(LC_AUTH_CALLBACK)} variant="contained">Войти</Button>
         <Button onClick={() => navigate("/register")}>Зарегистрироваться</Button>
     </>}>
         <FormProvider {...methods}>

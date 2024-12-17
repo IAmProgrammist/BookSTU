@@ -10,36 +10,41 @@ export const TITLE_MAP: {[key in string]: (params: Params<string>) => string} = 
     "/protected-route": () => "Защищённая страница",
 }
 
+function Adads() {
+    return <Typography>This is home!</Typography>;
+}
+
 export function AppRoutes() {
-    const publicRoutes = useRoutes([
-        {
-            path: '/',
-            element: <RouteHeader isProtected={false}/>,
-            children: [
-                { path: '/', element: <Navigate to='/home' replace /> },
-                { path: '/home', element: <Typography>This is home!</Typography> },
-                { path: '*', element: <Navigate to='/home' replace /> }
-            ]
-        }
-    ]);
-    const authRoutes = useRoutes([
+    const routes = useRoutes([
         {
             path: '/',
             children: [
-                { path: '/login', element: <LoginPage/> },
-                { path: '/register', element: <RegisterPage/> },
-            ]
-        }
-    ])
-    const protectedRoutes = useRoutes([
-        {
-            path: '/',
-            element: <RouteHeader isProtected/>,
-            children: [
-                { path: '/protected-route', element: <Typography>This protected home!</Typography> },
+                {
+                    path: '/',
+                    children: [
+                        { path: '/', element: <Navigate to='/home' replace /> },
+                        { path: '/login', element: <LoginPage/> },
+                        { path: '/register', element: <RegisterPage/> },
+                    ]
+                },
+                {
+                    path: '/',
+                    element: <RouteHeader isProtected/>,
+                    children: [
+                        { path: '/protected-route', element: <Typography>This protected home!</Typography> },
+                    ]
+                },
+                {
+                    path: '/',
+                    element: <RouteHeader isProtected={false}/>,
+                    children: [
+                        { path: '/home', element: <Adads/> },
+                        { path: '*', element: <Navigate to='/home' replace /> }
+                    ]
+                },
             ]
         }
     ]);
 
-    return protectedRoutes ?? authRoutes ?? publicRoutes;
+    return <>{routes}</>;
 }
