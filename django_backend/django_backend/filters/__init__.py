@@ -1,0 +1,1 @@
+from django_backend.filters.genre import GenreFilter

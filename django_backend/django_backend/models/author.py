@@ -3,7 +3,7 @@ from django_backend.models import FileModel
 
 
 class Author(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     surname = models.TextField(blank=False, null=False)
     name = models.TextField(blank=False, null=False)
     patronymics = models.TextField(blank=True, null=False)

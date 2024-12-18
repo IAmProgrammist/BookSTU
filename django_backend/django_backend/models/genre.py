@@ -2,6 +2,6 @@ from django.db import models
 
 
 class Genre(models.Model):
-    id = models.IntegerField(primary_key=True)
-    name = models.TextField(blank=False, null=False)
-    description = models.TextField(blank=False, null=False)
+    id = models.AutoField(primary_key=True)
+    name = models.TextField(blank=False, null=False, max_length=40)
+    description = models.TextField(blank=False, null=False, max_length=2048)
