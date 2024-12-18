@@ -1,4 +1,12 @@
-from django_backend.serializers.genre import GenreSerializer
-from django_backend.serializers.genre import GenreShortSerializer
-from django_backend.serializers.author import AuthorSerializer
-from django_backend.serializers.author import AuthorShortSerializer
+from django_backend.serializers.genre import (
+    GenreSerializer,
+    GenreShortSerializer,
+)
+from django_backend.serializers.author import (
+    AuthorSerializer,
+    AuthorShortSerializer,
+)
+from django_backend.serializers.publishing_house import (
+    PublishingHouseSerializer,
+    PublishingHouseShortSerializer,
+)
