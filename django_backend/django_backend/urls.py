@@ -22,9 +22,34 @@ from django.views.static import serve
 from django.conf.urls.static import static
 from django_backend.views.user import urlpatterns as user_urlpatterns
 from django_backend.views.file import urlpatterns as file_urlpatterns
+from rest_framework.routers import DefaultRouter, SimpleRouter
+router = DefaultRouter()
+
+from django_backend.views.genre import (
+    GenreModelViewSet,
+    GenreShortModelViewSet,
+)
+
+from django_backend.views.author import (
+    AuthorModelViewSet,
+    AuthorShortModelViewSet,
+)
+
+from django_backend.views.publishing_house import (
+    PublishingHouseModelViewSet,
+    PublishingHouseShortModelViewSet,
+)
+
+router.register(r"genres", GenreModelViewSet, 'genres')
+router.register(r"short-genres", GenreShortModelViewSet, 'short-genres')
+router.register(r"authors", AuthorModelViewSet, 'authors')
+router.register(r"short-authors", AuthorShortModelViewSet, 'short-authors')
+router.register(r"publishing-houses", PublishingHouseModelViewSet, 'publishing-houses')
+router.register(r"short-publishing-houses", PublishingHouseShortModelViewSet, 'short-publishing-houses')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     *user_urlpatterns,
-    *file_urlpatterns
+    *file_urlpatterns,
+    path('api/', include(router.urls))
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

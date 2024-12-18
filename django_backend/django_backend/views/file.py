@@ -6,8 +6,7 @@ import json
 
 from django.views.decorators.http import require_http_methods
 
-from django_backend.models.file import FileModel
-from django.shortcuts import render
+from django_backend.models import FileModel
 
 
 @require_http_methods(["POST"])
