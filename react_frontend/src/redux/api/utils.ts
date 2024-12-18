@@ -2,6 +2,11 @@ import { fetchBaseQuery } from "@reduxjs/toolkit/query";
 import { ENV_API_SERVER, DEBUG } from "envconsts";
 import { LC_AUTH_CALLBACK } from "routes/RouteHeader";
 
+function getCookie(name) {
+    var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    if (match) return match[2];
+}
+
 const redirectLoginOn401Query = (apiPrefix = '/api') => async (args, api, extraOptions) => {
     let baseUrl = ENV_API_SERVER;
     if (apiPrefix)
@@ -9,6 +14,10 @@ const redirectLoginOn401Query = (apiPrefix = '/api') => async (args, api, extraO
     const baseQuery = fetchBaseQuery({
         baseUrl,
         prepareHeaders: (headers) => {
+            const csrftoken = getCookie("csrftoken");
+            if (csrftoken) {
+                headers.set('X-CSRFToken', csrftoken)
+            }
             return headers
         },
         mode: DEBUG ? "no-cors" : "cors"
@@ -43,7 +52,7 @@ export const withQueryParams = (url, params) => {
 
 export const constructFormData = (object: object): FormData => {
     let formData = new FormData();
-    
+
     Object.entries(object).forEach(([key, value]) => {
         formData.append(key, value);
     });

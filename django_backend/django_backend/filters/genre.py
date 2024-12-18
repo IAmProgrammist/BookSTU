@@ -11,3 +11,5 @@ class GenreFilter(filters.FilterSet):
 
     class Meta:
         model = Genre
+        fields = []
+
