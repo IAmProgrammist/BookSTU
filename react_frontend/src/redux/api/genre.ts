@@ -47,12 +47,18 @@ export const endpoints = (builder: BaseApiBuilder) => ({
             url: withQueryParams(`/${genresBase}/${id}/`, {}),
             method: "PUT",
             body: constructFormData(data)
-        })
+        }),
+        invalidatesTags: (_result, _error, arg) => [
+            { type: QUERY_TAGS.Genre, id: arg.id }
+        ]
     }),
     deleteGenre: builder.mutation<GenreDeleteResponse, GenreDeleteQuery>({
         query: ({ id }) => ({
             url: withQueryParams(`/${genresBase}/${id}/`, {}),
             method: "DELETE"
-        })
+        }),
+        invalidatesTags: (_result, _error, arg) => [
+            { type: QUERY_TAGS.Genre, id: arg.id }
+        ]
     })
 })

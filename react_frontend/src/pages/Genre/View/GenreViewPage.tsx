@@ -1,90 +1,51 @@
-import { Box, Button, Card, CardActionArea, CardContent, CardHeader, CircularProgress, Container, FormControl, Input, InputLabel, MenuItem, Pagination, Select, TextField, Typography } from "@mui/material";
-import { useGetGenreListQuery } from "../../../redux/api/baseApi";
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useParams } from "react-router-dom";
+import { useGetBookDescriptionListQuery, useGetGenreQuery } from "../../../redux/api/baseApi";
+import { Backdrop, Box, Button, Card, CardActionArea, CardContent, CardHeader, CircularProgress, Container, FormControl, Input, InputLabel, MenuItem, Pagination, Select, TextField, Typography } from "@mui/material";
 import { Whoops } from "../../../components/Whoops";
 import { useShowError } from "hooks/ShowError";
 import { useNavigate } from "react-router-dom";
 import { useDebounce } from "hooks/useDebounce";
+import { useSearchParamsFilter } from "hooks/SearchParamsFilter";
+import { Genre, GenreListQuery } from "../../../redux/types/genre";
 
 export function GenreViewPage() {
+    const { genreId } = useParams();
+    const { data, isError, error, isLoading, isSuccess } = useGetGenreQuery({ id: genreId, short: false });
+    const { data: booksData, isError: booksIsError, error: booksError, isLoading: booksIsLoading, isSuccess: booksIsSuccess } = useGetBookDescriptionListQuery({
+        size: 5,
+        genres: [genreId]
+    });
     const navigate = useNavigate();
 
-    const [localSearchString, setLocalSearchString] = useState("");
-    const [genreListFecthOptions, setGenreListFecthOptions] = useState({
-        q: "",
-        short: true,
-        ordering: null,
-        size: 15,
-        page: 1
-    })
-    const { data, isLoading, isError, error, isSuccess } = useGetGenreListQuery(genreListFecthOptions);
-
     useShowError({
-        isError,
-        error
+        isError, error
     });
 
-    useEffect(() => {
-        if (!isError) return;
-        if ((error as any)?.status === 404 && (error as any)?.data?.detail?.startsWith("Invalid page") && genreListFecthOptions.page != 1) {
-            setGenreListFecthOptions((prev) => ({ ...prev, page: 1 }));
-        }
-    }, [isError, error]);
-
-    const debouncedLocalSearchString = useDebounce(localSearchString);
-
-    useEffect(() => {
-        setGenreListFecthOptions((prev) => ({ ...prev, q: debouncedLocalSearchString }));
-    }, [debouncedLocalSearchString]);
+    useShowError({
+        isError: booksIsError,
+        error: booksError
+    });
 
     return <Container sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", gap: 3 }}>
         <Box sx={{ width: "100%", display: "flex" }}>
             <Box sx={{ flexGrow: 1, display: "flex", gap: 1 }}>
-                <TextField onChange={(ev) => setLocalSearchString(ev.target.value)} label="Поиск" />
-                <FormControl sx={{ minWidth: 200 }}>
-                    <InputLabel id="ordering">Сортировка</InputLabel>
-                    <Select
-                        labelId="ordering"
-                        id="ordering"
-                        value={genreListFecthOptions.ordering}
-                        label="Сортировка"
-                        onChange={(event) => {
-                            setGenreListFecthOptions((prev) => ({ ...prev, ordering: event.target.value }));
-                        }}
-                    >
-                        <MenuItem value={null}>Без сортировки</MenuItem>
-                        <MenuItem value="name">По имени по возрастанию</MenuItem>
-                        <MenuItem value="-name">По имени по убыванию</MenuItem>
-                    </Select>
-                </FormControl>
             </Box>
             <Box sx={{ display: "flex", gap: 1 }}>
-                <Button>Создать</Button>
+                <Button onClick={() => navigate(`/genres/${genreId}/update`)}>Обновить</Button>
+                <Button>Удалить</Button>
             </Box>
         </Box>
         {isError ? <Whoops /> :
             isLoading ? <CircularProgress /> : <></>}
-        {isSuccess ? (data.results.length == 0 ? <Whoops title="Жанров не найдено" description="Возможно, Вы даже пополните этот ещё пополняющийся список" /> :
-            <Box sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr));",
-                gap: 2,
-                width: "100%",
-                my: 4
-            }}>
-                {data.results.map((item) => <Card variant="outlined" key={item.id}>
-                    <CardActionArea onClick={() => navigate(`/genres/${item.id}`)}>
-                        <CardContent>
-                            <Typography variant="h5">
-                                {item.name}
-                            </Typography>
-                        </CardContent>
-                    </CardActionArea>
-                </Card>)}
-            </Box>) : null}
-        {data?.next || data?.previous ? <Pagination
-            count={Math.ceil(data?.count / genreListFecthOptions.size)}
-            page={genreListFecthOptions.page}
-            onChange={(_ev, page) => setGenreListFecthOptions((prev) => ({ ...prev, page }))} /> : null}
+        {isSuccess ? <Card sx={{width: "100%"}}>
+            <CardContent>
+                <Typography variant="h4">{data.name}</Typography>
+            </CardContent>
+            <CardContent>
+                <Typography variant="body1">{(data as Genre)?.description}</Typography>
+            </CardContent>
+        </Card> : null}
+        <Typography sx={{alignSelf: "start"}} variant="h4">Книги в этом жанре:</Typography>
     </Container>
 }

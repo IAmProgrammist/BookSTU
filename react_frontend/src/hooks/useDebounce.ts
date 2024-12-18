@@ -7,6 +7,7 @@ export function useDebounce(value, delay = 500) {
 
   useEffect(
     () => {
+      if (!value?.byUser) return;
       // Выставить debouncedValue равным value (переданное значение) 
       // после заданной задержки
       const handler = setTimeout(() => {
