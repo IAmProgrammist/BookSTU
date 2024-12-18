@@ -10,3 +10,7 @@ from django_backend.serializers.publishing_house import (
     PublishingHouseSerializer,
     PublishingHouseShortSerializer,
 )
+from django_backend.serializers.book_description import (
+    BookDescriptionSerializer,
+    BookDescriptionShortSerializer
+)

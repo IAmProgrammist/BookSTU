@@ -13,4 +13,4 @@ class Author(models.Model):
     name = models.TextField(blank=False, null=False, validators=[validate_name])
     patronymics = models.TextField(blank=True, null=False, validators=[validate_patronymics])
     description = models.TextField(blank=False, null=False)
-    icon = models.ForeignKey(FileModel, null=True, on_delete=models.CASCADE)
+    icon = models.ForeignKey(FileModel, null=True, on_delete=models.SET_NULL)

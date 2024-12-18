@@ -1,10 +1,7 @@
 from django_backend.models import Author
 from django_backend.serializers import AuthorSerializer, AuthorShortSerializer
 from rest_framework import viewsets
-from rest_framework.decorators import action
 from django_backend.pagintaion import CustomPagination
-from rest_framework.exceptions import ValidationError
-from rest_framework.response import Response
 from django_filters import rest_framework as filters
 from django_backend.filters import AuthorFilter
 from rest_framework.filters import OrderingFilter

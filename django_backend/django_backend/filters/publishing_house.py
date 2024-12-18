@@ -1,9 +1,8 @@
 from rest_framework import generics
 from django_filters import rest_framework as filters
 from django_backend.models import PublishingHouse
+from django_backend.filters.base import NumberInFilter
 
-class NumberInFilter(filters.BaseInFilter, filters.NumberFilter):
-    pass
 
 class PublishingHouseFilter(filters.FilterSet):
     id = NumberInFilter(field_name="id", lookup_expr="in")
@@ -12,4 +11,3 @@ class PublishingHouseFilter(filters.FilterSet):
     class Meta:
         model = PublishingHouse
         fields = []
-
