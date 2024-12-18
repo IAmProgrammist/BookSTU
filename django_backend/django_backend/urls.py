@@ -24,9 +24,13 @@ from django_backend.views.user import urlpatterns as user_urlpatterns
 from django_backend.views.file import urlpatterns as file_urlpatterns
 from rest_framework.routers import DefaultRouter, SimpleRouter
 router = DefaultRouter()
-from django_backend.views.genre import GenreModelViewSet
+from django_backend.views.genre import (
+    GenreModelViewSet,
+    GenreShortModelViewSet,
+)
 
 router.register(r"genres", GenreModelViewSet)
+router.register(r"genres-short", GenreShortModelViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
