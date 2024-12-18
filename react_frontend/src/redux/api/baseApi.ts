@@ -10,15 +10,9 @@ import { endpoints as publishingHouseEndpoints } from "./publishingHouse";
 
 export type BaseApiBuilder = EndpointBuilder<(args: any, api: any, extraOptions: any) => Promise<QueryReturnValue<unknown, FetchBaseQueryError, FetchBaseQueryMeta>>, string, "baseApi">
 
-export const shortBase = "short-";
-
 export const baseApi = createApi({
     reducerPath: 'baseApi',
-    tagTypes: [
-        QUERY_TAGS.CSRF,
-        QUERY_TAGS.User,
-        QUERY_TAGS.Me
-    ],
+    tagTypes: Object.values(QUERY_TAGS),
     baseQuery: redirectLoginOn401Query("/api"),
     endpoints: () => ({})
 }).injectEndpoints(({

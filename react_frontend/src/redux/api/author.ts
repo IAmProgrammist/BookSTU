@@ -1,4 +1,5 @@
-import { BaseApiBuilder, shortBase } from "../api/baseApi";
+import { BaseApiBuilder } from "../api/baseApi";
+import { shortBase } from "../types/base";
 import { constructFormData, withQueryParams } from "./utils";
 import { QUERY_TAGS } from "../types/tags";
 import {
@@ -19,14 +20,14 @@ export const authorsShortBase = shortBase + authorsBase;
 
 export const endpoints = (builder: BaseApiBuilder) => ({
     getAuthorList: builder.query<AuthorListResponse, AuthorListQuery>({
-        query: ({ short = true, ...data }) => withQueryParams(`/${short ? authorsBase : authorsShortBase}/`, data),
+        query: ({ short = true, ...data }) => withQueryParams(`/${short ? authorsShortBase : authorsBase }/`, data),
         providesTags: (result, error) => error ? [] : [
             QUERY_TAGS.Author,
             ...(result.results.map((item) => ({ type: QUERY_TAGS.Author, id: item.id })))
         ]
     }),
     getAuthor: builder.query<AuthorResponse, AuthorQuery>({
-        query: ({ short = true, id }) => withQueryParams(`/${short ? authorsBase : authorsShortBase}/${id}/`, {}),
+        query: ({ short = true, id }) => withQueryParams(`/${short ? authorsShortBase : authorsBase}/${id}/`, {}),
         providesTags: (result, error) => error ? [] : [
             { type: QUERY_TAGS.Author, id: result.id }
         ]

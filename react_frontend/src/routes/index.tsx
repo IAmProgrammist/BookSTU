@@ -4,10 +4,12 @@ import { LoginPage } from "../pages/Auth/Login";
 import { RegisterPage } from "../pages/Auth/Register/Register";
 import React from "react";
 import { RouteHeader } from "./RouteHeader";
+import { GenreViewPage } from "../pages/Genre/View/GenreViewPage";
 
 export const TITLE_MAP: { [key in string]: (params: Params<string>) => string } = {
     "/home": () => "Домашняя страница",
     "/protected-route": () => "Защищённая страница",
+    "/genres": () => "Жанры"
 }
 
 function Adads() {
@@ -30,7 +32,9 @@ export function AppRoutes() {
             path: '/',
             element: <RouteHeader isProtected={false} />,
             children: [
-                { path: '/home', element: <Adads /> }
+                { path: '/home', element: <Adads /> },
+                { path: '/genres/:genreId', element: <GenreViewPage/> },
+                { path: '/genres', element: <GenreViewPage/> }
             ]
         },
         { path: '*', element: <Navigate to='/home' replace /> }

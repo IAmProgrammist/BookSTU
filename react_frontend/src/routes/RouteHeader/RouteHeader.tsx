@@ -2,7 +2,7 @@ import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { LC_AUTH_CALLBACK, LC_TOKEN, RouteHeaderProps } from "./types";
 import { Suspense, useCallback, useEffect } from "react";
 import React from "react";
-import { AppBar, Button, IconButton, Menu, MenuItem, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Button, IconButton, Menu, MenuItem, Toolbar, Typography } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { TITLE_MAP } from "routes";
@@ -44,7 +44,7 @@ export function RouteHeader({ isProtected }: RouteHeaderProps) {
     const params = useParams();
 
     return <>
-        <AppBar position="fixed" >
+        <AppBar position="relative">
             <Toolbar>
                 <IconButton
                     size="large"
@@ -91,7 +91,9 @@ export function RouteHeader({ isProtected }: RouteHeaderProps) {
             </Toolbar>
         </AppBar>
         <Suspense fallback={"Мы всё почти загрузили!"}>
+            <Box sx={{minHeight: "100%", py: 4}}>
             <Outlet />
+            </Box>
         </Suspense>
     </>
 }

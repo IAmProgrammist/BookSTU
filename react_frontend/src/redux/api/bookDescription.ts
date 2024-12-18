@@ -1,4 +1,5 @@
-import { BaseApiBuilder, shortBase } from "../api/baseApi";
+import { BaseApiBuilder } from "../api/baseApi";
+import { shortBase } from "../types/base";
 import { constructFormData, withQueryParams } from "./utils";
 import { QUERY_TAGS } from "../types/tags";
 import {
@@ -19,14 +20,14 @@ export const bookDescriptionsShortBase = shortBase + bookDescriptionsBase;
 
 export const endpoints = (builder: BaseApiBuilder) => ({
     getBookDescriptionList: builder.query<BookDescriptionListResponse, BookDescriptionListQuery>({
-        query: ({ short = true, ...data }) => withQueryParams(`/${short ? bookDescriptionsBase : bookDescriptionsShortBase}/`, data),
+        query: ({ short = true, ...data }) => withQueryParams(`/${short ? bookDescriptionsShortBase : bookDescriptionsBase}/`, data),
         providesTags: (result, error) => error ? [] : [
             QUERY_TAGS.BookDescription,
             ...(result.results.map((item) => ({ type: QUERY_TAGS.BookDescription, id: item.id })))
         ]
     }),
     getBookDescription: builder.query<BookDescriptionResponse, BookDescriptionQuery>({
-        query: ({ short = true, id }) => withQueryParams(`/${short ? bookDescriptionsBase : bookDescriptionsShortBase}/${id}/`, {}),
+        query: ({ short = true, id }) => withQueryParams(`/${short ? bookDescriptionsShortBase : bookDescriptionsBase}/${id}/`, {}),
         providesTags: (result, error) => error ? [] : [
             { type: QUERY_TAGS.BookDescription, id: result.id }
         ]

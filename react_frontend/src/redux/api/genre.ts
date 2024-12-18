@@ -1,4 +1,5 @@
-import { BaseApiBuilder, shortBase } from "../api/baseApi";
+import { BaseApiBuilder } from "../api/baseApi";
+import { shortBase } from "../types/base";
 import { constructFormData, withQueryParams } from "./utils";
 import { QUERY_TAGS } from "../types/tags";
 import {
@@ -19,14 +20,14 @@ export const genresShortBase = shortBase + genresBase;
 
 export const endpoints = (builder: BaseApiBuilder) => ({
     getGenreList: builder.query<GenreListResponse, GenreListQuery>({
-        query: ({ short = true, ...data }) => withQueryParams(`/${short ? genresBase : genresShortBase}/`, data),
+        query: ({ short = true, ...data }) => withQueryParams(`/${short ? genresShortBase : genresBase}/`, data),
         providesTags: (result, error) => error ? [] : [
             QUERY_TAGS.Genre,
             ...(result.results.map((item) => ({ type: QUERY_TAGS.Genre, id: item.id })))
         ]
     }),
     getGenre: builder.query<GenreResponse, GenreQuery>({
-        query: ({ short = true, id }) => withQueryParams(`/${short ? genresBase : genresShortBase}/${id}/`, {}),
+        query: ({ short = true, id }) => withQueryParams(`/${short ? genresShortBase : genresBase}/${id}/`, {}),
         providesTags: (result, error) => error ? [] : [
             { type: QUERY_TAGS.Genre, id: result.id }
         ]

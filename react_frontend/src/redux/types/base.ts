@@ -17,3 +17,5 @@ export interface PageableListResponse<T> {
     previous: string
     results: T[]
 }
+
+export const shortBase = "short-";

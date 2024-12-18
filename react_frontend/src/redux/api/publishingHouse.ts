@@ -1,4 +1,5 @@
-import { BaseApiBuilder, shortBase } from "../api/baseApi";
+import { BaseApiBuilder } from "../api/baseApi";
+import { shortBase } from "../types/base";
 import { constructFormData, withQueryParams } from "./utils";
 import { QUERY_TAGS } from "../types/tags";
 import {
@@ -19,14 +20,14 @@ export const publishingHousesShortBase = shortBase + publishingHousesBase;
 
 export const endpoints = (builder: BaseApiBuilder) => ({
     getPublishingHouseList: builder.query<PublishingHouseListResponse, PublishingHouseListQuery>({
-        query: ({ short = true, ...data }) => withQueryParams(`/${short ? publishingHousesBase : publishingHousesShortBase}/`, data),
+        query: ({ short = true, ...data }) => withQueryParams(`/${short ? publishingHousesShortBase : publishingHousesBase}/`, data),
         providesTags: (result, error) => error ? [] : [
             QUERY_TAGS.PublishingHouse,
             ...(result.results.map((item) => ({ type: QUERY_TAGS.PublishingHouse, id: item.id })))
         ]
     }),
     getPublishingHouse: builder.query<PublishingHouseResponse, PublishingHouseQuery>({
-        query: ({ short = true, id }) => withQueryParams(`/${short ? publishingHousesBase : publishingHousesShortBase}/${id}/`, {}),
+        query: ({ short = true, id }) => withQueryParams(`/${short ? publishingHousesShortBase : publishingHousesBase}/${id}/`, {}),
         providesTags: (result, error) => error ? [] : [
             { type: QUERY_TAGS.PublishingHouse, id: result.id }
         ]
