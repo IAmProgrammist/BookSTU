@@ -39,6 +39,7 @@ export const endpoints = (builder: BaseApiBuilder) => ({
             body: constructFormData(data)
         }),
         invalidatesTags: (result, error) => error ? [] : [
+            QUERY_TAGS.Author,
             { type: QUERY_TAGS.Author, id: result.id }
         ]
     }),
@@ -47,12 +48,19 @@ export const endpoints = (builder: BaseApiBuilder) => ({
             url: withQueryParams(`/${authorsBase}/${id}/`, {}),
             method: "PUT",
             body: constructFormData(data)
-        })
+        }),
+        invalidatesTags: (_result, _error, arg) => [
+            { type: QUERY_TAGS.Author, id: arg.id }
+        ]
     }),
     deleteAuthor: builder.mutation<AuthorDeleteResponse, AuthorDeleteQuery>({
         query: ({ id }) => ({
             url: withQueryParams(`/${authorsBase}/${id}/`, {}),
             method: "DELETE"
-        })
+        }),
+        invalidatesTags: (_result, error, arg) => error ? [] : [
+            QUERY_TAGS.Author,
+            { type: QUERY_TAGS.Author, id: arg.id }
+        ]
     })
 })

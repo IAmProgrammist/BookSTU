@@ -7,11 +7,15 @@ import { RouteHeader } from "./RouteHeader";
 import { GenreListPage } from "../pages/Genre/List/GenreListPage";
 import { GenreViewPage } from "../pages/Genre/View/GenreViewPage";
 import { GenreUpdatePage } from "../pages/Genre/Update";
+import { GenreCreatePage } from "../pages/Genre/Create";
 
 export const TITLE_MAP: { [key in string]: (params: Params<string>) => string } = {
     "/home": () => "Домашняя страница",
     "/protected-route": () => "Защищённая страница",
-    "/genres": () => "Жанры"
+    "/genres": () => "Жанры",
+    "/genres/create": () => "Создать жанр",
+    "/genres/:genreId": ({genreId}) => `Жанр ${genreId}`,
+    "/genres/:genreId/update": ({genreId}) => `Обновить жанр ${genreId}`,
 }
 
 function Adads() {
@@ -28,6 +32,8 @@ export function AppRoutes() {
             element: <RouteHeader isProtected />,
             children: [
                 { path: '/protected-route', element: <Typography>This protected home!</Typography> },
+                { path: '/genres/create', element: <GenreCreatePage/> },
+                { path: '/genres/:genreId/update', element: <GenreUpdatePage/> },
             ]
         },
         {
@@ -35,9 +41,7 @@ export function AppRoutes() {
             element: <RouteHeader isProtected={false} />,
             children: [
                 { path: '/home', element: <Adads /> },
-                { path: '/genres/create', element: <GenreViewPage/> },
                 { path: '/genres/:genreId', element: <GenreViewPage/> },
-                { path: '/genres/:genreId/update', element: <GenreUpdatePage/> },
                 { path: '/genres', element: <GenreListPage/> }
             ]
         },

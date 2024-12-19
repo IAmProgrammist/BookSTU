@@ -39,6 +39,7 @@ export const endpoints = (builder: BaseApiBuilder) => ({
             body: constructFormData(data)
         }),
         invalidatesTags: (result, error) => error ? [] : [
+            QUERY_TAGS.Genre,
             { type: QUERY_TAGS.Genre, id: result.id }
         ]
     }),
@@ -58,6 +59,7 @@ export const endpoints = (builder: BaseApiBuilder) => ({
             method: "DELETE"
         }),
         invalidatesTags: (_result, _error, arg) => [
+            QUERY_TAGS.Genre,
             { type: QUERY_TAGS.Genre, id: arg.id }
         ]
     })

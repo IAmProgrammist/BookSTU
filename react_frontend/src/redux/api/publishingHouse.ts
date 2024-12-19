@@ -39,6 +39,7 @@ export const endpoints = (builder: BaseApiBuilder) => ({
             body: constructFormData(data)
         }),
         invalidatesTags: (result, error) => error ? [] : [
+            QUERY_TAGS.PublishingHouse,
             { type: QUERY_TAGS.PublishingHouse, id: result.id }
         ]
     }),
@@ -47,12 +48,20 @@ export const endpoints = (builder: BaseApiBuilder) => ({
             url: withQueryParams(`/${publishingHousesBase}/${id}/`, {}),
             method: "PUT",
             body: constructFormData(data)
-        })
+        }),
+        invalidatesTags: (_result, _error, arg) => [
+            { type: QUERY_TAGS.PublishingHouse, id: arg.id }
+        ]
     }),
     deletePublishingHouse: builder.mutation<PublishingHouseDeleteResponse, PublishingHouseDeleteQuery>({
         query: ({ id }) => ({
             url: withQueryParams(`/${publishingHousesBase}/${id}/`, {}),
             method: "DELETE"
-        })
+        }),
+
+        invalidatesTags: (_result, _error, arg) => [
+            QUERY_TAGS.PublishingHouse,
+            { type: QUERY_TAGS.PublishingHouse, id: arg.id }
+        ]
     })
 })
