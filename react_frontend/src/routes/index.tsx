@@ -16,6 +16,7 @@ import { AuthorCreatePage } from "../pages/Author/Create";
 import { AuthorListPage } from "../pages/Author/List";
 import { AuthorUpdatePage } from "../pages/Author/Update";
 import { AuthorViewPage } from "../pages/Author/View";
+import { BookDescriptionListQuery } from "pages/BookDescription/List/BookDescriptionListPage";
 
 export const TITLE_MAP: { [key in string]: (params: Params<string>) => string } = {
     "/home": () => "Домашняя страница",
@@ -52,13 +53,13 @@ export function AppRoutes() {
             path: '/',
             element: <RouteHeader isProtected={false} />,
             children: [
-                { path: '/book-descriptions', element: <Adads /> },
                 { path: '/genres/:genreId', element: <GenreViewPage/> },
                 { path: '/genres', element: <GenreListPage/> },
                 { path: '/authors/:authorId', element: <AuthorViewPage/> },
                 { path: '/authors', element: <AuthorListPage/> },
                 { path: '/publishing-houses/:publishingHouseId', element: <PublishingHouseViewPage/> },
                 { path: '/publishing-houses', element: <PublishingHouseListPage/> },
+                { path: '/book-descriptions', element: <BookDescriptionListQuery/> },
             ]
         },
         { path: '*', element: <Navigate to='/book-descriptions' replace /> }
