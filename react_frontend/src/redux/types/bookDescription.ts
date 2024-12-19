@@ -1,7 +1,7 @@
 import { Author } from "./author"
 import { PageableListQuery, PageableListResponse, SearcheableListQuery, SortableListQuery } from "./base"
 import { CSRFMiddlewareTokenQueryFormMixin } from "./csrf"
-import { FileId } from "./file"
+import { FileObj } from "./file"
 import { Genre } from "./genre"
 import { PublishingHouse } from "./publishingHouse"
 
@@ -13,7 +13,7 @@ export interface BookDescriptionShort {
     genres: Genre["id"]
     publishing_house: PublishingHouse["id"]
     authors: Author["id"]
-    icon: FileId
+    icon: FileObj["id"]
 }
 
 export interface BookDescription extends BookDescriptionShort {

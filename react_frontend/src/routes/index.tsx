@@ -12,6 +12,8 @@ import { PublishingHouseCreatePage } from "../pages/PublishingHouse/Create";
 import { PublishingHouseUpdatePage } from "../pages/PublishingHouse/Update";
 import { PublishingHouseViewPage } from "../pages/PublishingHouse/View";
 import { PublishingHouseListPage } from "../pages/PublishingHouse/List";
+import { AuthorCreatePage } from "../pages/Author/Create";
+import { AuthorListPage } from "../pages/Author/List";
 
 export const TITLE_MAP: { [key in string]: (params: Params<string>) => string } = {
     "/home": () => "Домашняя страница",
@@ -40,6 +42,7 @@ export function AppRoutes() {
                 { path: '/genres/:genreId/update', element: <GenreUpdatePage/> },
                 { path: '/publishing-houses/create', element: <PublishingHouseCreatePage/> },
                 { path: '/publishing-houses/:publishingHouseId/update', element: <PublishingHouseUpdatePage/> },
+                { path: '/authors/create', element: <AuthorCreatePage/> },
             ]
         },
         {
@@ -49,6 +52,7 @@ export function AppRoutes() {
                 { path: '/book-descriptions', element: <Adads /> },
                 { path: '/genres/:genreId', element: <GenreViewPage/> },
                 { path: '/genres', element: <GenreListPage/> },
+                { path: '/authors', element: <AuthorListPage/> },
                 { path: '/publishing-houses/:publishingHouseId', element: <PublishingHouseViewPage/> },
                 { path: '/publishing-houses', element: <PublishingHouseListPage/> },
             ]

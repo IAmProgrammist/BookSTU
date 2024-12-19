@@ -7,6 +7,7 @@ import { endpoints as authorEndpoints } from "./author";
 import { endpoints as bookDescriptionEndpoints } from "./bookDescription";
 import { endpoints as genreEndpoints } from "./genre";
 import { endpoints as publishingHouseEndpoints } from "./publishingHouse";
+import { endpoints as filesEndpoints } from "./file";
 
 export type BaseApiBuilder = EndpointBuilder<(args: any, api: any, extraOptions: any) => Promise<QueryReturnValue<unknown, FetchBaseQueryError, FetchBaseQueryMeta>>, string, "baseApi">
 
@@ -33,6 +34,9 @@ export const baseApi = createApi({
 })).injectEndpoints(({
     endpoints: publishingHouseEndpoints,
     overrideExisting: false
+})).injectEndpoints(({
+    endpoints: filesEndpoints,
+    overrideExisting: false
 }))
 
 export const {
@@ -50,6 +54,7 @@ export const {
     useCreateBookDescriptionMutation,
     useCreateGenreMutation,
     useCreatePublishingHouseMutation,
+    useCreateFileMutation,
     useUpdateAuthorMutation,
     useUpdateBookDescriptionMutation,
     useUpdateGenreMutation,

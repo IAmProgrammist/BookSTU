@@ -1,6 +1,6 @@
 import { PageableListQuery, PageableListResponse, SearcheableListQuery, SortableListQuery } from "./base"
 import { CSRFMiddlewareTokenQueryFormMixin } from "./csrf"
-import { FileId } from "./file"
+import { FileObj } from "./file"
 
 // Базовые модели
 export interface AuthorShort {
@@ -8,7 +8,7 @@ export interface AuthorShort {
     name: string
     surname: string
     patronymics: string
-    icon: FileId
+    icon: FileObj["id"]
 }
 
 export interface Author extends AuthorShort {
