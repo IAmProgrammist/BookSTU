@@ -32,13 +32,13 @@ services:
       args:
         - API_SERVER=${ENV_API_SERVER}
     volumes:
-      - react_static_volume:/usr/src/app/build/static
+      - react_static_volume:/nginx
     hostname: frontend
     expose:
       - 3000
     env_file:
       - .env
-    command: serve -s build -l 3000
+    command: cp -r /usr/src/app/build/ /nginx/
     links:
       - backend
 
@@ -48,7 +48,7 @@ services:
     volumes:
       - django_static_volume:/usr/src/app/django_files/static
       - django_media_volume:/usr/src/app/media
-      - react_static_volume:/usr/src/app/react_files/static
+      - react_static_volume:/usr/src/app/react_files
     ports:
       - 80:80
     links:
