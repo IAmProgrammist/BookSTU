@@ -1,1 +1,1 @@
-export * from "./GenreViewPage"
+export * from "./AuthorViewPage"

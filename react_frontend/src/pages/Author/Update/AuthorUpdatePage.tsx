@@ -1,20 +1,24 @@
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useGetCSRFQuery, useGetGenreQuery, useUpdateGenreMutation } from "../../../redux/api/baseApi";
-import { Button, Card, CardActions, CardContent, CircularProgress, Container, Stack, TextField } from "@mui/material";
+import { useGetCSRFQuery, useGetAuthorQuery, useUpdateAuthorMutation, useCreateFileMutation } from "../../../redux/api/baseApi";
+import { Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, CircularProgress, Container, Stack, TextField, Typography } from "@mui/material";
 import { Whoops } from "../../../components/Whoops";
 import { useShowError } from "hooks/ShowError";
 import { useNavigate } from "react-router-dom";
-import { Genre } from "../../../redux/types/genre";
+import { Author } from "../../../redux/types/author";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useSnackbar } from "notistack";
 import { usePermissions } from "hooks/usePermissions";
+import { ENV_API_SERVER } from "envconsts";
+import NoPhotographyIcon from '@mui/icons-material/NoPhotography';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import { VisuallyHiddenInput } from "components/VisuallyHiddenInput";
 
-export function GenreUpdatePage() {
-    const { genreId } = useParams();
+export function AuthorUpdatePage() {
+    const { authorId } = useParams();
     const { data: csrfData } = useGetCSRFQuery({});
-    const { data, isError, error, isLoading, isSuccess } = useGetGenreQuery({ id: genreId, short: false });
-    const [updateGenre, updateGenreStatus] = useUpdateGenreMutation();
+    const { data, isError, error, isLoading, isSuccess } = useGetAuthorQuery({ id: authorId, short: false });
+    const [updateAuthor, updateAuthorStatus] = useUpdateAuthorMutation();
 
     const methods = useForm({ mode: "onChange" });
     const navigate = useNavigate();
@@ -29,22 +33,25 @@ export function GenreUpdatePage() {
     const { enqueueSnackbar } = useSnackbar();
 
     const onSave = (data) => {
-        updateGenre({ ...data, id: genreId, csrfmiddlewaretoken: csrfData?.csrf });
+        updateAuthor({ ...data, id: authorId, csrfmiddlewaretoken: csrfData?.csrf });
     }
 
     useEffect(() => {
-        if (!updateGenreStatus.isSuccess) return;
+        if (!updateAuthorStatus.isSuccess) return;
         enqueueSnackbar({
-            message: "Жанр успешно обновлён",
+            message: "Автор успешно обновлён",
             variant: "success",
         })
-        navigate(`/genres/${genreId}/`)
+        navigate(`/authors/${authorId}/`)
 
-    }, [updateGenreStatus]);
+    }, [updateAuthorStatus]);
 
     useEffect(() => {
+        setValue("icon", data?.icon);
         setValue("name", data?.name);
-        setValue("description", (data as Genre)?.description);
+        setValue("surname", data?.surname);
+        setValue("patronymics", data?.patronymics);
+        setValue("description", (data as Author)?.description);
     }, [isSuccess])
 
     useShowError({
@@ -53,16 +60,24 @@ export function GenreUpdatePage() {
     });
 
     useShowError({
-        isError: updateGenreStatus.isError,
-        error: updateGenreStatus.error,
+        isError: updateAuthorStatus.isError,
+        error: updateAuthorStatus.error,
         formMethods: methods
     });
+
+    const [uploadFile, uploadFileStatus] = useCreateFileMutation();
+
+    useEffect(() => {
+        if (!uploadFileStatus.isSuccess) return;
+
+        setValue("icon", uploadFileStatus.data.id);
+    }, [uploadFileStatus]);
 
     const { data: permissions, isSuccess: permissionsIsSuccess } = usePermissions();
 
     useEffect(() => {
         if (permissionsIsSuccess) {
-            if (permissions.findIndex((item) => item === "django_backend.change_genre") === -1) {
+            if (permissions.findIndex((item) => item === "django_backend.change_author") === -1) {
                 enqueueSnackbar({
                     message: "Недостаточно прав",
                     variant: "error",
@@ -80,19 +95,114 @@ export function GenreUpdatePage() {
                 <FormProvider {...methods}>
                     <Stack spacing={2}>
                         <Controller
+                            name="icon"
+                            control={control}
+                            defaultValue={""}
+                            render={({ field: { value, onChange, ref } }) => {
+                                return <>
+                                    <Card variant="outlined">
+                                        <CardHeader
+                                            title="Фото автора"
+                                            avatar={
+                                                <Avatar aria-label="recipe">
+                                                    {value ? <Box
+                                                        sx={{
+                                                            width: 40,
+                                                            height: 40,
+                                                            objectFit: "cover"
+                                                        }}
+                                                        component="img"
+                                                        src={`${ENV_API_SERVER}/api/files/${value}/`} /> :
+                                                        <NoPhotographyIcon sx={{
+                                                            width: 40,
+                                                            height: 40
+                                                        }} />}
+                                                </Avatar>
+                                            }
+                                            action={<>
+                                                <Button
+                                                    component="label"
+                                                    role={undefined}
+                                                    disabled={isLoading || updateAuthorStatus.isLoading || uploadFileStatus.isLoading}
+                                                    tabIndex={-1}
+                                                    startIcon={<CloudUploadIcon />}
+                                                >
+                                                    {uploadFileStatus.isLoading ? "Идёт загрузка, подождите..." : "Загрузить фото"}
+                                                    <VisuallyHiddenInput
+                                                        type="file"
+                                                        onChange={(event) => {
+                                                            if (event.target.files.length == 0) return;
+
+                                                            uploadFile({
+                                                                file: event.target.files[0] as File,
+                                                                csrfmiddlewaretoken: csrfData.csrf
+                                                            })
+                                                        }}
+                                                        multiple
+                                                    />
+                                                </Button>
+                                                <Button
+                                                    disabled={isLoading || updateAuthorStatus.isLoading || uploadFileStatus.isLoading} onClick={() => onChange("")}>Очистить</Button></>
+                                            }>
+                                        </CardHeader>
+                                    </Card>
+
+                                    {!!errors?.icon ? <Typography color="error" variant="caption">{`${errors?.icon?.message}`}</Typography> : null}
+                                </>;
+                            }}
+                        />
+
+                        <Controller
+                            name="surname"
+                            control={control}
+                            defaultValue={""}
+                            render={({ field: { value, onChange, ref } }) => (
+                                <TextField
+                                    id="surname"
+                                    ref={ref}
+                                    disabled={isLoading || updateAuthorStatus.isLoading}
+                                    label="Фамилия"
+                                    sx={{ width: "100%" }}
+                                    value={value}
+                                    onChange={onChange}
+                                    helperText={`${errors?.surname?.message ?? ""}`}
+                                    error={!!errors?.surname} />
+                            )}
+                        />
+
+                        <Controller
                             name="name"
                             control={control}
                             defaultValue={""}
                             render={({ field: { value, onChange, ref } }) => (
                                 <TextField
+                                    id="name"
                                     ref={ref}
-                                    disabled={isLoading && isSuccess || updateGenreStatus.isLoading}
-                                    label="Название"
+                                    disabled={isLoading || updateAuthorStatus.isLoading}
+                                    label="Имя"
                                     sx={{ width: "100%" }}
                                     value={value}
                                     onChange={onChange}
                                     helperText={`${errors?.name?.message ?? ""}`}
                                     error={!!errors?.name} />
+                            )}
+                        />
+
+                        <Controller
+                            name="patronymics"
+                            control={control}
+                            defaultValue={""}
+                            render={({ field: { value, onChange, ref } }) => (
+                                <TextField
+                                    id="patronymics"
+                                    ref={ref}
+                                    disabled={isLoading || updateAuthorStatus.isLoading}
+                                    label="Отчество"
+                                    sx={{ width: "100%" }}
+                                    value={value}
+                                    onChange={onChange}
+                                    helperText={`${errors?.patronymics?.message ?? ""}`}
+                                    error={!!errors?.patronymics} />
                             )}
                         />
 
@@ -103,7 +213,7 @@ export function GenreUpdatePage() {
                             render={({ field: { value, onChange, ref } }) => (
                                 <TextField
                                     ref={ref}
-                                    disabled={isLoading && isSuccess || updateGenreStatus.isLoading}
+                                    disabled={isLoading || updateAuthorStatus.isLoading}
                                     label="Описание"
                                     multiline
                                     rows={10}
@@ -119,8 +229,8 @@ export function GenreUpdatePage() {
                 </FormProvider>
             </CardContent>
             <CardActions>
-                <Button disabled={isLoading && isSuccess || updateGenreStatus.isLoading} onClick={() => handleSubmit(onSave)()}>Сохранить</Button>
-                <Button disabled={isLoading && isSuccess || updateGenreStatus.isLoading} onClick={() => navigate(-1)}>Отмена</Button>
+                <Button disabled={isLoading || updateAuthorStatus.isLoading || uploadFileStatus.isLoading} onClick={() => handleSubmit(onSave)()}>Сохранить</Button>
+                <Button disabled={isLoading || updateAuthorStatus.isLoading || uploadFileStatus.isLoading} onClick={() => navigate(-1)}>Отмена</Button>
             </CardActions>
         </Card> : null}
     </Container>

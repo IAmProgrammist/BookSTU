@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useCreateAuthorMutation, useCreateFileMutation, useGetCSRFQuery } from "../../../redux/api/baseApi";
-import { Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Container, Stack, TextField, Typography } from "@mui/material";
+import { Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, Container, Stack, TextField, Typography } from "@mui/material";
 import { useShowError } from "hooks/ShowError";
 import { useNavigate } from "react-router-dom";
 import { Controller, FormProvider, useForm } from "react-hook-form";
@@ -8,20 +8,8 @@ import { useSnackbar } from "notistack";
 import { usePermissions } from "hooks/usePermissions";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { ENV_API_SERVER } from "envconsts";
-import { styled } from '@mui/material/styles';
 import NoPhotographyIcon from '@mui/icons-material/NoPhotography';
-
-const VisuallyHiddenInput = styled('input')({
-    clip: 'rect(0 0 0 0)',
-    clipPath: 'inset(50%)',
-    height: 1,
-    overflow: 'hidden',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    whiteSpace: 'nowrap',
-    width: 1,
-});
+import { VisuallyHiddenInput } from "components/VisuallyHiddenInput";
 
 export function AuthorCreatePage() {
     const { data: csrfData } = useGetCSRFQuery({});
@@ -100,7 +88,8 @@ export function AuthorCreatePage() {
                                                     {value ? <Box
                                                         sx={{
                                                             width: 40,
-                                                            height: 40
+                                                            height: 40,
+                                                            objectFit: "cover"
                                                         }}
                                                         component="img"
                                                         src={`${ENV_API_SERVER}/api/files/${value}/`} /> :
@@ -132,7 +121,7 @@ export function AuthorCreatePage() {
                                                         multiple
                                                     />
                                                 </Button>
-                                                <Button onClick={() => onChange(null)}>Очистить</Button></>
+                                                <Button onClick={() => onChange("")}>Очистить</Button></>
                                             }>
                                         </CardHeader>
                                     </Card>
