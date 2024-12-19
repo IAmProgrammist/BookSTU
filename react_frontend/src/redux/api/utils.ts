@@ -40,10 +40,9 @@ export const withQueryParams = (url, params) => {
     Object.entries(params).forEach(([key, value]) => {
         if (value != null) {
             if (Array.isArray(value) && value.length)
-                for (const arrKey in value)
-                    url += (url.includes('?') ? '&' : '?') + `${key}=${encodeURI(value[arrKey])}`
+                url += (url.includes('?') ? '&' : '?') + `${key}=${encodeURIComponent(value.join(","))}`
             else if (!Array.isArray(value))
-                url += (url.includes('?') ? '&' : '?') + `${key}=${encodeURI(`${value}`)}`;
+                url += (url.includes('?') ? '&' : '?') + `${key}=${encodeURIComponent(`${value}`)}`;
         }
     });
 

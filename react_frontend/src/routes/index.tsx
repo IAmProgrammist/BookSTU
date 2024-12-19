@@ -8,6 +8,10 @@ import { GenreListPage } from "../pages/Genre/List/GenreListPage";
 import { GenreViewPage } from "../pages/Genre/View/GenreViewPage";
 import { GenreUpdatePage } from "../pages/Genre/Update";
 import { GenreCreatePage } from "../pages/Genre/Create";
+import { PublishingHouseCreatePage } from "../pages/PublishingHouse/Create";
+import { PublishingHouseUpdatePage } from "../pages/PublishingHouse/Update";
+import { PublishingHouseViewPage } from "../pages/PublishingHouse/View";
+import { PublishingHouseListPage } from "../pages/PublishingHouse/List";
 
 export const TITLE_MAP: { [key in string]: (params: Params<string>) => string } = {
     "/home": () => "Домашняя страница",
@@ -24,7 +28,7 @@ function Adads() {
 
 export function AppRoutes() {
     const routes = useRoutes([
-        { path: '/', element: <Navigate to='/home' replace /> },
+        { path: '/', element: <Navigate to='/book-descriptions' replace /> },
         { path: '/login', element: <LoginPage /> },
         { path: '/register', element: <RegisterPage /> },
         {
@@ -34,18 +38,22 @@ export function AppRoutes() {
                 { path: '/protected-route', element: <Typography>This protected home!</Typography> },
                 { path: '/genres/create', element: <GenreCreatePage/> },
                 { path: '/genres/:genreId/update', element: <GenreUpdatePage/> },
+                { path: '/publishing-houses/create', element: <PublishingHouseCreatePage/> },
+                { path: '/publishing-houses/:publishingHouseId/update', element: <PublishingHouseUpdatePage/> },
             ]
         },
         {
             path: '/',
             element: <RouteHeader isProtected={false} />,
             children: [
-                { path: '/home', element: <Adads /> },
+                { path: '/book-descriptions', element: <Adads /> },
                 { path: '/genres/:genreId', element: <GenreViewPage/> },
-                { path: '/genres', element: <GenreListPage/> }
+                { path: '/genres', element: <GenreListPage/> },
+                { path: '/publishing-houses/:publishingHouseId', element: <PublishingHouseViewPage/> },
+                { path: '/publishing-houses', element: <PublishingHouseListPage/> },
             ]
         },
-        { path: '*', element: <Navigate to='/home' replace /> }
+        { path: '*', element: <Navigate to='/book-descriptions' replace /> }
     ]);
 
     return <>{routes}</>;

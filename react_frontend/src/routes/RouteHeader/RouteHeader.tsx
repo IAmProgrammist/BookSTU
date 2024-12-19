@@ -2,12 +2,16 @@ import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { LC_AUTH_CALLBACK, LC_TOKEN, RouteHeaderProps } from "./types";
 import { Suspense, useCallback, useEffect } from "react";
 import React from "react";
-import { AppBar, Box, Button, IconButton, Menu, MenuItem, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Button, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Toolbar, Typography } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { TITLE_MAP } from "routes";
 import { useGetUserMeQuery, useLogoutUserMutation } from "../../redux/api/baseApi";
 import { matchPath } from "react-router-dom";
+import TheaterComedyIcon from '@mui/icons-material/TheaterComedy';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
+import ApartmentIcon from '@mui/icons-material/Apartment';
 
 export function RouteHeader({ isProtected }: RouteHeaderProps) {
     const navigate = useNavigate();
@@ -38,7 +42,34 @@ export function RouteHeader({ isProtected }: RouteHeaderProps) {
     const currentLocation = useLocation();
     const params = useParams();
 
+    const [drawerOpen, setDrawerOpen] = React.useState(false);
+
+    const toggleDrawer = (newOpen: boolean) => () => {
+        setDrawerOpen(newOpen);
+    };
+
     return <>
+        <Drawer open={drawerOpen} onClose={toggleDrawer(false)}>
+            <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
+                <List>
+                    {[
+                        { text: 'Библиотека', icon: <LibraryBooksIcon/>, to: "/book-descriptions" },
+                        { text: 'Жанры', icon: <TheaterComedyIcon/>, to: "/genres" },
+                        { text: 'Авторы', icon: <LocalLibraryIcon/>, to: "/authors" },
+                        { text: 'Издательства', icon: <ApartmentIcon/>, to: "/publishing-houses" }
+                    ].map(({ text, icon, to }, index) => (
+                        <ListItem key={text} disablePadding>
+                            <ListItemButton onClick={() => navigate(to)}>
+                                <ListItemIcon>
+                                    {icon}
+                                </ListItemIcon>
+                                <ListItemText primary={text} />
+                            </ListItemButton>
+                        </ListItem>
+                    ))}
+                </List>
+            </Box>
+        </Drawer>
         <AppBar position="relative">
             <Toolbar>
                 <IconButton
@@ -47,6 +78,7 @@ export function RouteHeader({ isProtected }: RouteHeaderProps) {
                     color="inherit"
                     aria-label="menu"
                     sx={{ mr: 2 }}
+                    onClick={() => setDrawerOpen(!drawerOpen)}
                 >
                     <MenuIcon />
                 </IconButton>
