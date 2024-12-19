@@ -1,7 +1,7 @@
 import React from 'react';
 import { AppRoutes } from './routes';
 import { BrowserRouter } from 'react-router-dom';
-import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
+import { createTheme, CssBaseline, GlobalStyles, ThemeProvider } from '@mui/material';
 import { SnackbarProvider } from 'notistack';
 
 const theme = createTheme({

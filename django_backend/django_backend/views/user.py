@@ -2,7 +2,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.http import JsonResponse
 from django_backend.forms.user import SignUpForm, LoginForm
 from django.urls import re_path as url
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 import json
 
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -36,6 +36,10 @@ def user_signup(request):
         passport_data=form.cleaned_data.get('passport_data')
     )
     user_profile.save()
+
+    # Дефолтная группа читателя, нужна чтобы вручную не проставлять всем юзерам права вручную
+    reader, created = Group.objects.get_or_create(name='reader')
+    reader.user_set.add(user)
 
     return JsonResponse({}, status=200)
 
@@ -89,9 +93,20 @@ def session_view(request):
     if not this_profile:
         return JsonResponse({"message": "Unable to find profile"}, status=400)
 
-    return JsonResponse({'is_authenticated': True, 'username': this_profile.name, 'surname': this_profile.surname, 'patronymics': this_profile.patronymics,
-                         'passport_data': this_profile.passport_data, 'phone_number': this_profile.phone_number, 'banned': this_profile.banned,
-                         'user_id': request.user.id, 'email': request.user.username}, status=200)
+    permissions = request.user.get_all_permissions()
+
+    return JsonResponse({
+        'is_authenticated': True,
+        'username': this_profile.name,
+        'surname': this_profile.surname,
+        'patronymics': this_profile.patronymics,
+        'passport_data': this_profile.passport_data,
+        'phone_number': this_profile.phone_number,
+        'banned': this_profile.banned,
+        'user_id': request.user.id,
+        'email': request.user.username,
+        'permissions': [str(permission) for permission in permissions]
+    }, status=200)
 
 
 urlpatterns = [

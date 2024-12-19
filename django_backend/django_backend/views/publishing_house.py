@@ -6,6 +6,7 @@ from django_filters import rest_framework as filters
 from django_backend.filters import PublishingHouseFilter
 from rest_framework.filters import OrderingFilter
 from rest_framework import viewsets, mixins
+from django_backend.permissions import PublishingHousePermission
 
 
 class PublishingHouseModelViewSet(viewsets.ModelViewSet):
@@ -14,6 +15,7 @@ class PublishingHouseModelViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination
     filterset_class = PublishingHouseFilter
     filter_backends = (filters.DjangoFilterBackend, OrderingFilter,)
+    permission_classes = (PublishingHousePermission,)
     ordering_fields = ('id', 'name')
 
 
@@ -25,4 +27,5 @@ class PublishingHouseShortModelViewSet(mixins.RetrieveModelMixin,
     pagination_class = CustomPagination
     filterset_class = PublishingHouseFilter
     filter_backends = (filters.DjangoFilterBackend, OrderingFilter,)
+    permission_classes = (PublishingHousePermission,)
     ordering_fields = ('id', 'name')

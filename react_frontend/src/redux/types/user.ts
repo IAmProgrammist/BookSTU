@@ -10,6 +10,7 @@ export interface User {
     email: string
     phone_number: string
     passport_data: string
+    permissions?: string[]
 }
 
 export interface UserSignupQuery extends CSRFMiddlewareTokenQueryFormMixin, Exclude<User, "is_authenticated" | "banned" | "user_id"> {

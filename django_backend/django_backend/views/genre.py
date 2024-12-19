@@ -6,6 +6,7 @@ from django_filters import rest_framework as filters
 from django_backend.filters import GenreFilter
 from rest_framework.filters import OrderingFilter
 from rest_framework import viewsets, mixins
+from django_backend.permissions import GenrePermission
 
 
 class GenreModelViewSet(viewsets.ModelViewSet):
@@ -14,6 +15,7 @@ class GenreModelViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination
     filterset_class = GenreFilter
     filter_backends = (filters.DjangoFilterBackend, OrderingFilter,)
+    permission_classes = (GenrePermission,)
     ordering_fields = ('id', 'name')
 
 
@@ -25,4 +27,5 @@ class GenreShortModelViewSet(mixins.RetrieveModelMixin,
     pagination_class = CustomPagination
     filterset_class = GenreFilter
     filter_backends = (filters.DjangoFilterBackend, OrderingFilter,)
+    permission_classes = (GenrePermission,)
     ordering_fields = ('id', 'name')

@@ -2,11 +2,16 @@ import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { LC_AUTH_CALLBACK, LC_TOKEN, RouteHeaderProps } from "./types";
 import { Suspense, useCallback, useEffect } from "react";
 import React from "react";
-import { AppBar, Button, IconButton, Menu, MenuItem, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Button, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Toolbar, Typography } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { TITLE_MAP } from "routes";
 import { useGetUserMeQuery, useLogoutUserMutation } from "../../redux/api/baseApi";
+import { matchPath } from "react-router-dom";
+import TheaterComedyIcon from '@mui/icons-material/TheaterComedy';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
+import ApartmentIcon from '@mui/icons-material/Apartment';
 
 export function RouteHeader({ isProtected }: RouteHeaderProps) {
     const navigate = useNavigate();
@@ -17,12 +22,6 @@ export function RouteHeader({ isProtected }: RouteHeaderProps) {
     const logoutNoRedirect = useCallback(() => {
         logout({});
     }, [navigate]);
-
-    useEffect(() => {
-        if (logoutStatus.isSuccess) {
-            navigate("/login");
-        }
-    }, [logoutStatus]);
 
     useEffect(() => {
         if (isProtected && isSuccess && !meData.is_authenticated) {
@@ -43,8 +42,35 @@ export function RouteHeader({ isProtected }: RouteHeaderProps) {
     const currentLocation = useLocation();
     const params = useParams();
 
+    const [drawerOpen, setDrawerOpen] = React.useState(false);
+
+    const toggleDrawer = (newOpen: boolean) => () => {
+        setDrawerOpen(newOpen);
+    };
+
     return <>
-        <AppBar position="fixed" >
+        <Drawer open={drawerOpen} onClose={toggleDrawer(false)}>
+            <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
+                <List>
+                    {[
+                        { text: 'Библиотека', icon: <LibraryBooksIcon/>, to: "/book-descriptions" },
+                        { text: 'Жанры', icon: <TheaterComedyIcon/>, to: "/genres" },
+                        { text: 'Авторы', icon: <LocalLibraryIcon/>, to: "/authors" },
+                        { text: 'Издательства', icon: <ApartmentIcon/>, to: "/publishing-houses" }
+                    ].map(({ text, icon, to }, index) => (
+                        <ListItem key={text} disablePadding>
+                            <ListItemButton onClick={() => navigate(to)}>
+                                <ListItemIcon>
+                                    {icon}
+                                </ListItemIcon>
+                                <ListItemText primary={text} />
+                            </ListItemButton>
+                        </ListItem>
+                    ))}
+                </List>
+            </Box>
+        </Drawer>
+        <AppBar position="relative">
             <Toolbar>
                 <IconButton
                     size="large"
@@ -52,13 +78,17 @@ export function RouteHeader({ isProtected }: RouteHeaderProps) {
                     color="inherit"
                     aria-label="menu"
                     sx={{ mr: 2 }}
+                    onClick={() => setDrawerOpen(!drawerOpen)}
                 >
                     <MenuIcon />
                 </IconButton>
                 <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                    {Object.entries(TITLE_MAP).find(([key, _]) => key === currentLocation.pathname)?.[1]?.(params)}
+                    {Object.entries(TITLE_MAP).find(([key, _]) => !!matchPath(currentLocation.pathname, key))?.[1]?.(params)}
                 </Typography>
-                {!meData?.is_authenticated ? <Button color="inherit" onClick={logout}>Войти</Button> : <div>
+                {!meData?.is_authenticated ? <Button color="inherit" onClick={() => {
+                    localStorage.setItem(LC_AUTH_CALLBACK, window.location.href);
+                    navigate("/login")
+                }}>Войти</Button> : <div>
                     <IconButton
                         size="large"
                         aria-label="account of current user"
@@ -91,7 +121,9 @@ export function RouteHeader({ isProtected }: RouteHeaderProps) {
             </Toolbar>
         </AppBar>
         <Suspense fallback={"Мы всё почти загрузили!"}>
-            <Outlet />
+            <Box sx={{ minHeight: "100%", py: 4 }}>
+                <Outlet />
+            </Box>
         </Suspense>
     </>
 }
