@@ -1,12 +1,13 @@
 import { Box, Button, Card, CardActionArea, CardContent, CardHeader, CircularProgress, Container, FormControl, Input, InputLabel, MenuItem, Pagination, Select, TextField, Typography } from "@mui/material";
 import { useGetPublishingHouseListQuery } from "../../../redux/api/baseApi";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Whoops } from "../../../components/Whoops";
 import { useShowError } from "hooks/ShowError";
 import { useNavigate } from "react-router-dom";
 import { useDebounce } from "hooks/useDebounce";
 import { useSearchParamsFilter } from "hooks/SearchParamsFilter";
 import { PublishingHouseListQuery } from "redux/types/publishingHouse";
+import { usePermissions } from "hooks/usePermissions";
 
 const PAGE_SIZE = 15;
 
@@ -15,7 +16,7 @@ export function PublishingHouseListPage() {
 
     const { params, patchParams } = useSearchParamsFilter<Pick<PublishingHouseListQuery, "q" | "ordering" | "page">>("publishing-house");
 
-    const [localSearchString, setLocalSearchString] = useState({val: "", byUser: false});
+    const [localSearchString, setLocalSearchString] = useState({ val: "", byUser: false });
     const { data, isLoading, isError, error, isSuccess } = useGetPublishingHouseListQuery({
         q: params?.q,
         ordering: params?.ordering,
@@ -37,7 +38,7 @@ export function PublishingHouseListPage() {
     }, [isError, error]);
 
     useEffect(() => {
-        setLocalSearchString({val: params?.q ?? "", byUser: false});
+        setLocalSearchString({ val: params?.q ?? "", byUser: false });
     }, [params?.q])
 
     const debouncedLocalSearchString = useDebounce(localSearchString, 500);
@@ -55,12 +56,19 @@ export function PublishingHouseListPage() {
         patchParams({ q: debouncedLocalSearchString.val ?? null });
     }, [debouncedLocalSearchString]);
 
+
+    const { data: permissions, isSuccess: permissionsIsSuccess } = usePermissions();
+
+    const shouldShowCreate = useMemo(() => {
+        return permissionsIsSuccess && permissions.findIndex((item) => item === "django_backend.add_publishinghouse") !== -1;
+    }, [permissions, permissionsIsSuccess]);
+
     return <Container sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", gap: 3 }}>
         <Box sx={{ width: "100%", display: "flex" }}>
             <Box sx={{ flexGrow: 1, display: "flex", gap: 1 }}>
                 <TextField
                     value={localSearchString.val}
-                    onChange={(ev) => setLocalSearchString({val: ev.target.value, byUser: true})}
+                    onChange={(ev) => setLocalSearchString({ val: ev.target.value, byUser: true })}
                     label="Поиск" />
                 <FormControl sx={{ minWidth: 200 }}>
                     <InputLabel id="ordering">Сортировка</InputLabel>
@@ -80,7 +88,7 @@ export function PublishingHouseListPage() {
                 </FormControl>
             </Box>
             <Box sx={{ display: "flex", gap: 1 }}>
-                <Button onClick={() => navigate(`/publishing-houses/create`)}>Создать</Button>
+                {shouldShowCreate ? <Button onClick={() => navigate(`/publishing-houses/create`)}>Создать</Button> : null}
             </Box>
         </Box>
         {isError ? <Whoops /> :

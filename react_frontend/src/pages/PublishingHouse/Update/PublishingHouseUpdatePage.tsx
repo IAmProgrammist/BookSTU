@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { PublishingHouse } from "../../../redux/types/publishingHouse";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useSnackbar } from "notistack";
+import { usePermissions } from "hooks/usePermissions";
 
 export function PublishingHouseUpdatePage() {
     const { publishingHouseId } = useParams();
@@ -56,6 +57,20 @@ export function PublishingHouseUpdatePage() {
         error: updatePublishingHouseStatus.error,
         formMethods: methods
     });
+
+    const { data: permissions, isSuccess: permissionsIsSuccess } = usePermissions();
+
+    useEffect(() => {
+        if (permissionsIsSuccess) {
+            if (permissions.findIndex((item) => item === "django_backend.change_publishinghouse") === -1) {
+                enqueueSnackbar({
+                    message: "Недостаточно прав",
+                    variant: "error",
+                })
+                navigate("/");
+            }
+        }
+    }, [permissionsIsSuccess]);
 
     return <Container sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", gap: 3 }}>
         {isError ? <Whoops /> :

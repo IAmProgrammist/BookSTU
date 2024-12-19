@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDeleteGenreMutation, useGetBookDescriptionListQuery, useGetCSRFQuery, useGetGenreQuery } from "../../../redux/api/baseApi";
 import { Box, Button, Card, CardContent, CircularProgress, Container, Typography } from "@mui/material";
@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { Genre } from "../../../redux/types/genre";
 import { ConfirmationDialog } from "components/ConfirmationDialog/ConfirmationDialog";
 import { useSnackbar } from "notistack";
+import { usePermissions } from "hooks/usePermissions";
 
 export function GenreViewPage() {
     const { genreId } = useParams();
@@ -45,13 +46,24 @@ export function GenreViewPage() {
         navigate(`/genres`)
     }, [deleteGenreStatus]);
 
+
+    const { data: permissions, isSuccess: permissionsIsSuccess } = usePermissions();
+
+    const shouldShowDelete = useMemo(() => {
+        return permissionsIsSuccess && permissions.findIndex((item) => item === "django_backend.delete_genre") !== -1;
+    }, [permissions, permissionsIsSuccess]);
+
+    const shouldShowUpdate = useMemo(() => {
+        return permissionsIsSuccess && permissions.findIndex((item) => item === "django_backend.change_genre") !== -1;
+    }, [permissions, permissionsIsSuccess]);
+
     return <Container sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", gap: 3 }}>
         <Box sx={{ width: "100%", display: "flex" }}>
             <Box sx={{ flexGrow: 1, display: "flex", gap: 1 }}>
             </Box>
             <Box sx={{ display: "flex", gap: 1 }}>
-                <Button onClick={() => navigate(`/genres/${genreId}/update`)}>Обновить</Button>
-                <Button onClick={() => setDeleteOpen(true)}>Удалить</Button>
+                {shouldShowUpdate && <Button onClick={() => navigate(`/genres/${genreId}/update`)}>Обновить</Button>}
+                {shouldShowDelete && <Button onClick={() => setDeleteOpen(true)}>Удалить</Button>}
             </Box>
         </Box>
         {isError ? <Whoops /> :

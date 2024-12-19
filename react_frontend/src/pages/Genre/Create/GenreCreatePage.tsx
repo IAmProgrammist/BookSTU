@@ -5,6 +5,7 @@ import { useShowError } from "hooks/ShowError";
 import { useNavigate } from "react-router-dom";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useSnackbar } from "notistack";
+import { usePermissions } from "hooks/usePermissions";
 
 export function GenreCreatePage() {
     const { data: csrfData } = useGetCSRFQuery({});
@@ -40,6 +41,20 @@ export function GenreCreatePage() {
         error: createGenreStatus.error,
         formMethods: methods
     });
+
+    const { data: permissions, isSuccess: permissionsIsSuccess } = usePermissions();
+
+    useEffect(() => {
+        if (permissionsIsSuccess) {
+            if (permissions.findIndex((item) => item === "django_backend.add_genre") === -1) {
+                enqueueSnackbar({
+                    message: "Недостаточно прав",
+                    variant: "error",
+                })
+                navigate("/");
+            }
+        }
+    }, [permissionsIsSuccess]);
 
     return <Container sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", gap: 3 }}>
         <Card sx={{ width: "100%" }}>
