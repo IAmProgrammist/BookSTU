@@ -65,7 +65,7 @@ export function GenreListPage() {
 
     return <Container sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", gap: 3 }}>
         <Box sx={{ width: "100%", display: "flex" }}>
-            <Box sx={{ flexGrow: 1, display: "flex", gap: 1 }}>
+            <Box sx={{ flexGrow: 1, display: "flex", gap: 1, flexWrap: "wrap" }}>
                 <TextField
                     value={localSearchString.val}
                     onChange={(ev) => setLocalSearchString({ val: ev.target.value, byUser: true })}

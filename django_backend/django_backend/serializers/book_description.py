@@ -1,8 +1,11 @@
 from rest_framework import serializers
-from django_backend.models import BookDescription
+from django_backend.models import BookDescription, Genre, Author
 
 
 class BookDescriptionSerializer(serializers.ModelSerializer):
+    genres = serializers.PrimaryKeyRelatedField(many=True, queryset=Genre.objects.all())
+    authors = serializers.PrimaryKeyRelatedField(many=True, queryset=Author.objects.all())
+
     class Meta:
         model = BookDescription
         fields = (
@@ -18,6 +21,9 @@ class BookDescriptionSerializer(serializers.ModelSerializer):
 
 
 class BookDescriptionShortSerializer(serializers.ModelSerializer):
+    genres = serializers.PrimaryKeyRelatedField(many=True, queryset=Genre.objects.all())
+    authors = serializers.PrimaryKeyRelatedField(many=True, queryset=Author.objects.all())
+
     class Meta:
         model = BookDescription
         fields = (

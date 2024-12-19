@@ -16,7 +16,8 @@ import { AuthorCreatePage } from "../pages/Author/Create";
 import { AuthorListPage } from "../pages/Author/List";
 import { AuthorUpdatePage } from "../pages/Author/Update";
 import { AuthorViewPage } from "../pages/Author/View";
-import { BookDescriptionListQuery } from "pages/BookDescription/List/BookDescriptionListPage";
+import { BookDescriptionListPage } from "../pages/BookDescription/List";
+import { BookDescriptionCreatePage } from "../pages/BookDescription/Create";
 
 export const TITLE_MAP: { [key in string]: (params: Params<string>) => string } = {
     "/home": () => "Домашняя страница",
@@ -47,6 +48,7 @@ export function AppRoutes() {
                 { path: '/publishing-houses/:publishingHouseId/update', element: <PublishingHouseUpdatePage/> },
                 { path: '/authors/create', element: <AuthorCreatePage/> },
                 { path: '/authors/:authorId/update', element: <AuthorUpdatePage/> },
+                { path: '/book-descriptions/create', element: <BookDescriptionCreatePage/> },
             ]
         },
         {
@@ -59,7 +61,7 @@ export function AppRoutes() {
                 { path: '/authors', element: <AuthorListPage/> },
                 { path: '/publishing-houses/:publishingHouseId', element: <PublishingHouseViewPage/> },
                 { path: '/publishing-houses', element: <PublishingHouseListPage/> },
-                { path: '/book-descriptions', element: <BookDescriptionListQuery/> },
+                { path: '/book-descriptions', element: <BookDescriptionListPage/> },
             ]
         },
         { path: '*', element: <Navigate to='/book-descriptions' replace /> }
