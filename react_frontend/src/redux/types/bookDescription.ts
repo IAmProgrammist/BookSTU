@@ -10,9 +10,9 @@ export interface BookDescriptionShort {
     id: number | string
     name: string
     isbn: string
-    genres: Genre["id"]
+    genres: Genre["id"][]
     publishing_house: PublishingHouse["id"]
-    authors: Author["id"]
+    authors: Author["id"][]
     icon: FileObj["id"]
 }
 

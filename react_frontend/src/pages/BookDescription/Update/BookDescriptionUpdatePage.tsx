@@ -1,8 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { useCreateBookDescriptionMutation, useCreateFileMutation, useGetAuthorListQuery, useGetCSRFQuery, useGetGenreListQuery, useGetPublishingHouseListQuery } from "../../../redux/api/baseApi";
+import {
+    useCreateFileMutation,
+    useGetAuthorListQuery,
+    useGetBookDescriptionQuery,
+    useGetCSRFQuery,
+    useGetGenreListQuery,
+    useGetPublishingHouseListQuery,
+    useGetPublishingHouseQuery,
+    useUpdateBookDescriptionMutation
+} from "../../../redux/api/baseApi";
 import { Autocomplete, Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, CircularProgress, Container, Stack, TextField, Typography } from "@mui/material";
 import { useShowError } from "hooks/ShowError";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useSnackbar } from "notistack";
 import { usePermissions } from "hooks/usePermissions";
@@ -11,8 +20,12 @@ import { ENV_API_SERVER } from "envconsts";
 import NoPhotographyIcon from '@mui/icons-material/NoPhotography';
 import { VisuallyHiddenInput } from "components/VisuallyHiddenInput";
 import { useDebounce } from "hooks/useDebounce";
+import { BookDescription } from "../../../redux/types/bookDescription";
+import { Whoops } from "components/Whoops";
 
-export function BookDescriptionCreatePage() {
+export function BookDescriptionUpdatePage() {
+    const { bookDescriptionId } = useParams();
+
     const [genresSelected, setGenresSelected] = useState([]);
     const [genreLocalStr, setGenreLocalStr] = useState({ val: "", byUser: true });
     const debouncedGenreLocalStr = useDebounce(genreLocalStr);
@@ -50,7 +63,39 @@ export function BookDescriptionCreatePage() {
     ));
 
     const { data: csrfData } = useGetCSRFQuery({});
-    const [createBookDescription, createBookDescriptionStatus] = useCreateBookDescriptionMutation();
+    const [updateBookDescription, updateBookDescriptionStatus] = useUpdateBookDescriptionMutation();
+
+    const { data, isError, error, isLoading, isSuccess } = useGetBookDescriptionQuery({ id: bookDescriptionId, short: false });
+
+    useShowError({
+        isError, error
+    })
+
+    const { data: dataAuthors, ...authorsStatus } = useGetAuthorListQuery({ id: data?.authors?.length ? data?.authors : [0], size: 50, short: true }, { skip: !isSuccess });
+    const { data: dataGenres, ...genresStatus } = useGetGenreListQuery({ id: data?.genres?.length ? data?.genres : [0], size: 50, short: true }, { skip: !isSuccess });
+    const { data: publishingHouses, ...publishingHousesStatus } = useGetPublishingHouseQuery({ id: data?.publishing_house || 1, short: true }, { skip: !isSuccess });
+
+    useEffect(() => {
+        setValue("icon", data?.icon || "");
+        setValue("name", data?.name);
+        setValue("isbn", data?.isbn);
+        setValue("description", (data as BookDescription)?.description);
+    }, [isSuccess]);
+
+    useEffect(() => {
+        if (!authorsStatus.isSuccess) return;
+        setAuthorsSelected(dataAuthors.results);
+    }, [authorsStatus?.isSuccess]);
+
+    useEffect(() => {
+        if (!genresStatus.isSuccess) return;
+        setGenresSelected(dataGenres.results);
+    }, [genresStatus?.isSuccess])
+
+    useEffect(() => {
+        if (!publishingHousesStatus.isSuccess) return;
+        setPublishingHousesSelected([publishingHouses]);
+    }, [publishingHousesStatus?.isSuccess])
 
     const methods = useForm({ mode: "onChange" });
     const navigate = useNavigate();
@@ -65,8 +110,9 @@ export function BookDescriptionCreatePage() {
     const { enqueueSnackbar } = useSnackbar();
 
     const onSave = (data) => {
-        createBookDescription({
+        updateBookDescription({
             ...data,
+            id: bookDescriptionId,
             csrfmiddlewaretoken: csrfData?.csrf,
             genres: genresSelected.map((item) => item.id),
             authors: authorsSelected.map((item) => item.id),
@@ -75,18 +121,18 @@ export function BookDescriptionCreatePage() {
     }
 
     useEffect(() => {
-        if (!createBookDescriptionStatus.isSuccess) return;
+        if (!updateBookDescriptionStatus.isSuccess) return;
         enqueueSnackbar({
-            message: "Описание книги успешно добавлено",
+            message: "Книга успешно обновлена",
             variant: "success",
         })
-        navigate(`/book-descriptions/${createBookDescriptionStatus.data.id}/`)
+        navigate(`/book-descriptions/${bookDescriptionId}/`)
 
-    }, [createBookDescriptionStatus?.isSuccess]);
+    }, [updateBookDescriptionStatus?.isSuccess]);
 
     useShowError({
-        isError: createBookDescriptionStatus.isError,
-        error: createBookDescriptionStatus.error,
+        isError: updateBookDescriptionStatus.isError,
+        error: updateBookDescriptionStatus.error,
         formMethods: methods
     });
 
@@ -102,7 +148,7 @@ export function BookDescriptionCreatePage() {
 
     useEffect(() => {
         if (permissionsIsSuccess) {
-            if (permissions.findIndex((item) => item === "django_backend.add_bookdescription") === -1) {
+            if (permissions.findIndex((item) => item === "django_backend.change_bookdescription") === -1) {
                 enqueueSnackbar({
                     message: "Недостаточно прав",
                     variant: "error",
@@ -113,7 +159,9 @@ export function BookDescriptionCreatePage() {
     }, [permissionsIsSuccess]);
 
     return <Container sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", gap: 3 }}>
-        <Card sx={{ width: "100%" }}>
+        {isError ? <Whoops /> :
+            isLoading ? <CircularProgress /> : <></>}
+        {isSuccess ? <Card sx={{ width: "100%" }}>
             <CardContent>
                 <FormProvider {...methods}>
                     <Stack spacing={2}>
@@ -146,7 +194,7 @@ export function BookDescriptionCreatePage() {
                                                 <Button
                                                     component="label"
                                                     role={undefined}
-                                                    disabled={uploadFileStatus.isLoading}
+                                                    disabled={uploadFileStatus.isLoading || isLoading || updateBookDescriptionStatus.isLoading}
                                                     tabIndex={-1}
                                                     startIcon={<CloudUploadIcon />}
                                                 >
@@ -164,7 +212,9 @@ export function BookDescriptionCreatePage() {
                                                         multiple
                                                     />
                                                 </Button>
-                                                <Button onClick={() => onChange("")}>Очистить</Button></>
+                                                <Button
+                                                    disabled={uploadFileStatus.isLoading || isLoading || updateBookDescriptionStatus.isLoading}
+                                                    onClick={() => onChange("")}>Очистить</Button></>
                                             }>
                                         </CardHeader>
                                     </Card>
@@ -182,7 +232,7 @@ export function BookDescriptionCreatePage() {
                                 <TextField
                                     id="name"
                                     ref={ref}
-                                    disabled={createBookDescriptionStatus.isLoading}
+                                    disabled={isLoading || updateBookDescriptionStatus.isLoading}
                                     label="Название"
                                     sx={{ width: "100%" }}
                                     value={value}
@@ -200,7 +250,7 @@ export function BookDescriptionCreatePage() {
                                 <TextField
                                     id="isbn"
                                     ref={ref}
-                                    disabled={createBookDescriptionStatus.isLoading}
+                                    disabled={isLoading || updateBookDescriptionStatus.isLoading}
                                     label="ISBN"
                                     sx={{ width: "100%" }}
                                     value={value}
@@ -221,7 +271,7 @@ export function BookDescriptionCreatePage() {
                                     isOptionEqualToValue={(option, value) => option.id === value.id}
                                     getOptionLabel={(option) => option.name}
                                     options={mergedGenresOptions}
-                                    loading={genresIsLoading}
+                                    loading={genresIsLoading || isLoading || updateBookDescriptionStatus.isLoading || genresStatus.isLoading}
                                     value={genresSelected}
                                     loadingText="Загрузка..."
                                     noOptionsText="Не найдено"
@@ -236,7 +286,7 @@ export function BookDescriptionCreatePage() {
                                             {...params}
                                             label="Жанры"
                                             helperText={`${errors?.genres?.message ?? ""}`}
-                                            error={!!errors?.genres} 
+                                            error={!!errors?.genres}
                                             slotProps={{
                                                 input: {
                                                     ...params.InputProps,
@@ -264,7 +314,7 @@ export function BookDescriptionCreatePage() {
                                     isOptionEqualToValue={(option, value) => option.id === value.id}
                                     getOptionLabel={(option) => `${option.surname} ${option.name} ${option.patronymics}`}
                                     options={mergedAuthorsOptions}
-                                    loading={authorsIsLoading}
+                                    loading={authorsIsLoading || isLoading || updateBookDescriptionStatus.isLoading || authorsStatus.isLoading}
                                     value={authorsSelected}
                                     loadingText="Загрузка..."
                                     noOptionsText="Не найдено"
@@ -279,7 +329,7 @@ export function BookDescriptionCreatePage() {
                                             {...params}
                                             label="Авторы"
                                             helperText={`${errors?.authors?.message ?? ""}`}
-                                            error={!!errors?.authors} 
+                                            error={!!errors?.authors}
                                             slotProps={{
                                                 input: {
                                                     ...params.InputProps,
@@ -308,7 +358,7 @@ export function BookDescriptionCreatePage() {
                                     isOptionEqualToValue={(option, value) => option.id === value.id}
                                     getOptionLabel={(option) => option.name}
                                     options={mergedPublishingHousesOptions}
-                                    loading={publishingHousesIsLoading}
+                                    loading={publishingHousesIsLoading || isLoading || updateBookDescriptionStatus.isLoading || publishingHousesStatus.isLoading}
                                     value={publishingHousesSelected}
                                     loadingText="Загрузка..."
                                     noOptionsText="Не найдено"
@@ -324,7 +374,7 @@ export function BookDescriptionCreatePage() {
                                             {...params}
                                             label="Издательство"
                                             helperText={`${errors?.publishing_house?.message ?? ""}`}
-                                            error={!!errors?.publishing_house} 
+                                            error={!!errors?.publishing_house}
                                             slotProps={{
                                                 input: {
                                                     ...params.InputProps,
@@ -347,7 +397,7 @@ export function BookDescriptionCreatePage() {
                             render={({ field: { value, onChange, ref } }) => (
                                 <TextField
                                     ref={ref}
-                                    disabled={createBookDescriptionStatus.isLoading}
+                                    disabled={isLoading}
                                     label="Описание"
                                     multiline
                                     rows={10}
@@ -363,9 +413,9 @@ export function BookDescriptionCreatePage() {
                 </FormProvider>
             </CardContent>
             <CardActions>
-                <Button disabled={createBookDescriptionStatus.isLoading} onClick={() => handleSubmit(onSave)()}>Сохранить</Button>
-                <Button disabled={createBookDescriptionStatus.isLoading} onClick={() => navigate(-1)}>Отмена</Button>
+                <Button disabled={isLoading || updateBookDescriptionStatus.isLoading || uploadFileStatus.isLoading} onClick={() => handleSubmit(onSave)()}>Сохранить</Button>
+                <Button disabled={isLoading || updateBookDescriptionStatus.isLoading || uploadFileStatus.isLoading} onClick={() => navigate(-1)}>Отмена</Button>
             </CardActions>
-        </Card>
+        </Card> : null}
     </Container>
 }

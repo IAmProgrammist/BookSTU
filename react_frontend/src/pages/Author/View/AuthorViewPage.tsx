@@ -72,12 +72,11 @@ export function AuthorViewPage() {
             isLoading ? <CircularProgress /> : <></>}
         {isSuccess ? <Card sx={{ width: "100%" }}>
             <CardContent sx={{ minHeight: 150 }}>
-                <Avatar sx={{ float: "left", width: 150, height: 150, mr: 1 }} aria-label="recipe">
+                <Box sx={{ float: "left", mr: 1 }} aria-label="recipe">
                     {data.icon ? <Box
                         sx={{
-                            width: 150,
-                            height: 150,
-                            objectFit: "cover"
+                            borderRadius: 1,
+                            width: 150
                         }}
                         component="img"
                         src={`${ENV_API_SERVER}/api/files/${data.icon}/`} /> :
@@ -85,7 +84,7 @@ export function AuthorViewPage() {
                             width: 150,
                             height: 150
                         }} />}
-                </Avatar>
+                </Box>
                 <Typography variant="h4">{data.surname} {data.name} {data.patronymics}</Typography>
                 <Typography variant="body1">{(data as Author)?.description}</Typography>
             </CardContent>

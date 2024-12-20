@@ -47,7 +47,7 @@ export function AuthorUpdatePage() {
     }, [updateAuthorStatus]);
 
     useEffect(() => {
-        setValue("icon", data?.icon);
+        setValue("icon", data?.icon || "");
         setValue("name", data?.name);
         setValue("surname", data?.surname);
         setValue("patronymics", data?.patronymics);
