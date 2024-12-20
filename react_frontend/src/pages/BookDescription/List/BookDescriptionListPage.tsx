@@ -30,7 +30,7 @@ export function BookDescriptionListPage() {
     ));
 
     useEffect(() => {
-        setGenresSelected(params?.genres);
+        setGenresSelected(params?.genres || []);
     }, [params?.genres]);
 
     const [authorsSelected, setAuthorsSelected] = useState([]);
@@ -46,7 +46,7 @@ export function BookDescriptionListPage() {
     ));
 
     useEffect(() => {
-        setAuthorsSelected(params?.authors);
+        setAuthorsSelected(params?.authors || []);
     }, [params?.authors]);
 
     const [publishingHousesSelected, setPublishingHousesSelected] = useState([]);
@@ -62,7 +62,7 @@ export function BookDescriptionListPage() {
     ));
 
     useEffect(() => {
-        setPublishingHousesSelected(params?.publishing_house);
+        setPublishingHousesSelected(params?.publishing_house || []);
     }, [params?.publishing_house]);
 
     const navigate = useNavigate();
@@ -210,7 +210,7 @@ export function BookDescriptionListPage() {
                     id="authors"
                     filterOptions={(x) => x}
                     isOptionEqualToValue={(option, value) => option.id === value.id}
-                    getOptionLabel={(option) => option.name}
+                    getOptionLabel={(option) => `${option.surname} ${option.name} ${option.patronymics}`}
                     options={mergedAuthorsOptions}
                     loading={authorsIsLoading}
                     value={authorsSelected}

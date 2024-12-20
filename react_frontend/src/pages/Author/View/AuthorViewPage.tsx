@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDeleteAuthorMutation, useGetBookDescriptionListQuery, useGetCSRFQuery, useGetAuthorQuery } from "../../../redux/api/baseApi";
-import { Avatar, Box, Button, Card, CardContent, CircularProgress, Container, Typography } from "@mui/material";
+import { Avatar, Box, Button, Card, CardActionArea, CardContent, CardHeader, CardMedia, CircularProgress, Container, Link, Typography } from "@mui/material";
 import { Whoops } from "../../../components/Whoops";
 import { useShowError } from "hooks/ShowError";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ import { useSnackbar } from "notistack";
 import { usePermissions } from "hooks/usePermissions";
 import { ENV_API_SERVER } from "envconsts";
 import NoPhotographyIcon from '@mui/icons-material/NoPhotography';
+import { SP_ROOT } from "hooks/SearchParamsFilter";
 
 export function AuthorViewPage() {
     const { authorId } = useParams();
@@ -20,7 +21,7 @@ export function AuthorViewPage() {
     const [deleteAuthor, deleteAuthorStatus] = useDeleteAuthorMutation();
     const { data, isError, error, isLoading, isSuccess } = useGetAuthorQuery({ id: authorId, short: false });
     const { data: booksData, isError: booksIsError, error: booksError, isLoading: booksIsLoading, isSuccess: booksIsSuccess } = useGetBookDescriptionListQuery({
-        size: 5,
+        size: 3,
         authors: [authorId]
     });
     const navigate = useNavigate();
@@ -59,6 +60,8 @@ export function AuthorViewPage() {
         return permissionsIsSuccess && permissions.findIndex((item) => item === "django_backend.change_author") !== -1;
     }, [permissions, permissionsIsSuccess]);
 
+    const {description = "", ...shortAuthor} = (data as Author) || {};
+
     return <Container sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", gap: 3 }}>
         <Box sx={{ width: "100%", display: "flex" }}>
             <Box sx={{ flexGrow: 1, display: "flex", gap: 1 }}>
@@ -91,7 +94,36 @@ export function AuthorViewPage() {
             <CardContent>
             </CardContent>
         </Card> : null}
-        <Typography sx={{ alignSelf: "start" }} variant="h4">Книги от автора:</Typography>
+        <Typography sx={{ alignSelf: "start" }} variant="h4">{!!booksData?.results?.length ? "Книги от автора:" : ""}</Typography>
+        <Box sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 300px));",
+            gap: 2,
+            width: "100%",
+            my: 4
+        }}>
+            {!!booksData?.results?.length && booksData.results.map((item) => <Card variant="outlined" key={item.id}>
+                <CardActionArea onClick={() => navigate(`/book-descriptions/${item.id}`)}>
+                    <CardHeader title={item.name} subheader={`ISBN: ${item.isbn}`} />
+                    <CardMedia>
+                        {item.icon ? <Box
+                            sx={{
+                                width: "100%",
+                                height: 300,
+                                objectFit: "cover"
+                            }}
+                            component="img"
+                            src={`${ENV_API_SERVER}/api/files/${item.icon}/`} /> :
+                            <NoPhotographyIcon sx={{
+                                width: "100%",
+                                height: 300,
+                                objectFit: "cover"
+                            }} />}
+                    </CardMedia>
+                </CardActionArea>
+            </Card>)}
+        </Box>
+        {!!booksData?.results?.length ? <Link href={`/book-descriptions?${SP_ROOT}=${encodeURIComponent(JSON.stringify({authors: [shortAuthor]}))}`}>Мне нужно больше книг!</Link> : null}
         <ConfirmationDialog
             id="author-delete"
             keepMounted

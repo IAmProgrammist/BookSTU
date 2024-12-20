@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-const SP_ROOT = "page_state"
+export const SP_ROOT = "page_state"
 
 function isEmpty(obj) {
     return Object.keys(obj).length === 0;

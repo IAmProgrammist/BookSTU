@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDeletePublishingHouseMutation, useGetBookDescriptionListQuery, useGetCSRFQuery, useGetPublishingHouseQuery } from "../../../redux/api/baseApi";
-import { Box, Button, Card, CardContent, CircularProgress, Container, Typography } from "@mui/material";
+import { Box, Button, Card, CardActionArea, CardContent, CardHeader, CardMedia, CircularProgress, Container, Link, Typography } from "@mui/material";
 import { Whoops } from "../../../components/Whoops";
 import { useShowError } from "hooks/ShowError";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,9 @@ import { PublishingHouse } from "../../../redux/types/publishingHouse";
 import { ConfirmationDialog } from "components/ConfirmationDialog/ConfirmationDialog";
 import { useSnackbar } from "notistack";
 import { usePermissions } from "hooks/usePermissions";
+import { ENV_API_SERVER } from "envconsts";
+import NoPhotographyIcon from '@mui/icons-material/NoPhotography';
+import { SP_ROOT } from "hooks/SearchParamsFilter";
 
 export function PublishingHouseViewPage() {
     const { publishingHouseId } = useParams();
@@ -57,6 +60,8 @@ export function PublishingHouseViewPage() {
         return permissionsIsSuccess && permissions.findIndex((item) => item === "django_backend.change_genre") !== -1;
     }, [permissions, permissionsIsSuccess]);
 
+    const { description = "", ...shortPublishingHouse } = (data as PublishingHouse) || {};
+
     return <Container sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", gap: 3 }}>
         <Box sx={{ width: "100%", display: "flex" }}>
             <Box sx={{ flexGrow: 1, display: "flex", gap: 1 }}>
@@ -76,7 +81,36 @@ export function PublishingHouseViewPage() {
                 <Typography variant="body1">{(data as PublishingHouse)?.description}</Typography>
             </CardContent>
         </Card> : null}
-        <Typography sx={{ alignSelf: "start" }} variant="h4">Книги этого издательства:</Typography>
+        <Typography sx={{ alignSelf: "start" }} variant="h4">{!!booksData?.results?.length ? "Книги от издательства:" : ""}</Typography>
+        <Box sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 300px));",
+            gap: 2,
+            width: "100%",
+            my: 4
+        }}>
+            {!!booksData?.results?.length && booksData.results.map((item) => <Card variant="outlined" key={item.id}>
+                <CardActionArea onClick={() => navigate(`/book-descriptions/${item.id}`)}>
+                    <CardHeader title={item.name} subheader={`ISBN: ${item.isbn}`} />
+                    <CardMedia>
+                        {item.icon ? <Box
+                            sx={{
+                                width: "100%",
+                                height: 300,
+                                objectFit: "cover"
+                            }}
+                            component="img"
+                            src={`${ENV_API_SERVER}/api/files/${item.icon}/`} /> :
+                            <NoPhotographyIcon sx={{
+                                width: "100%",
+                                height: 300,
+                                objectFit: "cover"
+                            }} />}
+                    </CardMedia>
+                </CardActionArea>
+            </Card>)}
+        </Box>
+        {!!booksData?.results?.length ? <Link href={`/book-descriptions?${SP_ROOT}=${encodeURIComponent(JSON.stringify({ publishing_house: [shortPublishingHouse] }))}`}>Мне нужно больше книг!</Link> : null}
         <ConfirmationDialog
             id="publishing-house-delete"
             keepMounted
