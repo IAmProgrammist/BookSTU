@@ -40,10 +40,9 @@ export const withQueryParams = (url, params) => {
     Object.entries(params).forEach(([key, value]) => {
         if (value != null) {
             if (Array.isArray(value) && value.length)
-                for (const arrKey in value)
-                    url += (url.includes('?') ? '&' : '?') + `${key}=${encodeURI(value[arrKey])}`
+                url += (url.includes('?') ? '&' : '?') + `${key}=${encodeURIComponent(value.join(","))}`
             else if (!Array.isArray(value))
-                url += (url.includes('?') ? '&' : '?') + `${key}=${encodeURI(`${value}`)}`;
+                url += (url.includes('?') ? '&' : '?') + `${key}=${encodeURIComponent(`${value}`)}`;
         }
     });
 
@@ -54,7 +53,13 @@ export const constructFormData = (object: object): FormData => {
     let formData = new FormData();
 
     Object.entries(object).forEach(([key, value]) => {
-        formData.append(key, value);
+        if (Array.isArray(value)) {
+            for (let i = 0; i < value.length; i++) {
+                formData.append(`${key}`, value[i]);
+            }    
+        } else {
+            formData.append(key, value);
+        }
     });
 
     return formData;

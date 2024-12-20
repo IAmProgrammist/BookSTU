@@ -5,6 +5,7 @@ from django_backend.pagintaion import CustomPagination
 from django_filters import rest_framework as filters
 from django_backend.filters import AuthorFilter
 from rest_framework.filters import OrderingFilter
+from django_backend.permissions import AuthorPermission
 
 
 class AuthorModelViewSet(viewsets.ModelViewSet):
@@ -13,6 +14,7 @@ class AuthorModelViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination
     filterset_class = AuthorFilter
     filter_backends = (filters.DjangoFilterBackend, OrderingFilter,)
+    permission_classes = (AuthorPermission,)
     ordering_fields = ('id', 'surname')
 
 
@@ -22,4 +24,5 @@ class AuthorShortModelViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination
     filterset_class = AuthorFilter
     filter_backends = (filters.DjangoFilterBackend, OrderingFilter,)
+    permission_classes = (AuthorPermission,)
     ordering_fields = ('id', 'surname')

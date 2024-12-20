@@ -29,13 +29,13 @@ export function useShowError({
             messageShown = true;
         }
 
-        if (formMethods && fetchError.status === "CUSTOM_ERROR") {
+        if (formMethods) {
             for (const [resourceKey, resourceValues] of Object.entries(serverError)) {
                 if (Array.isArray(resourceValues)) {
                     if (!resourceMapping[resourceKey]) {
-                        formMethods.setError(resourceKey, { type: "validate", message: (resourceValues[0] as FieldError).message })
+                        formMethods.setError(resourceKey, { type: "validate", message: typeof resourceValues[0] === 'string' ? resourceValues[0] : (resourceValues[0] as FieldError).message })
                     } else {
-                        formMethods.setError(resourceMapping[resourceKey], { type: "validate", message: (resourceValues[0] as FieldError).message })
+                        formMethods.setError(resourceMapping[resourceKey], { type: "validate", message: typeof resourceValues[0] === 'string' ? resourceValues[0] : (resourceValues[0] as FieldError).message })
                     }
                 }
             }

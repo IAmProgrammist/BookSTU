@@ -11,6 +11,9 @@ from django_backend.models import FileModel
 
 @require_http_methods(["POST"])
 def upload_file(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'is_authenticated': False}, status=401)
+
     form = FileForm(request.POST, request.FILES)
     if not form.is_valid():
         return JsonResponse(json.loads(form.errors.as_json()), status=400)
@@ -22,9 +25,6 @@ def upload_file(request):
 
 @require_http_methods(["GET"])
 def display_file(request, file_id=None):
-    if not request.user.is_authenticated:
-        return JsonResponse({'is_authenticated': False}, status=401)
-
     file_return = FileModel.objects.get(id=file_id)
 
     if not file_return:

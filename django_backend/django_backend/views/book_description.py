@@ -6,6 +6,7 @@ from django_filters import rest_framework as filters
 from django_backend.filters import BookDescriptionFilter
 from rest_framework.filters import OrderingFilter
 from rest_framework import viewsets, mixins
+from django_backend.permissions import BookDescriptionPermission
 
 
 class BookDescriptionModelViewSet(viewsets.ModelViewSet):
@@ -14,6 +15,7 @@ class BookDescriptionModelViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination
     filterset_class = BookDescriptionFilter
     filter_backends = (filters.DjangoFilterBackend, OrderingFilter,)
+    permission_classes = (BookDescriptionPermission,)
     ordering_fields = ('id',
                        'name',
                        'isbn',
@@ -28,6 +30,7 @@ class BookDescriptionShortModelViewSet(mixins.RetrieveModelMixin,
     pagination_class = CustomPagination
     filterset_class = BookDescriptionFilter
     filter_backends = (filters.DjangoFilterBackend, OrderingFilter,)
+    permission_classes = (BookDescriptionPermission,)
     ordering_fields = ('id',
                        'name',
                        'isbn',
