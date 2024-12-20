@@ -83,7 +83,7 @@ export function RouteHeader({ isProtected }: RouteHeaderProps) {
                     <MenuIcon />
                 </IconButton>
                 <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                    {Object.entries(TITLE_MAP).find(([key, _]) => !!matchPath(currentLocation.pathname, key))?.[1]?.(params)}
+                    {Object.entries(TITLE_MAP).find(([key, _]) => !!matchPath(key, currentLocation.pathname))?.[1]?.(params)}
                 </Typography>
                 {!meData?.is_authenticated ? <Button color="inherit" onClick={() => {
                     localStorage.setItem(LC_AUTH_CALLBACK, window.location.href);
