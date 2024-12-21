@@ -1,8 +1,9 @@
 name: Build and deploy
 run-name: ${{ github.actor }} is running build and deploy
 on:
-  branches:
-    - main
+  push:
+    branches:
+      - main
 jobs:
   build:
     steps:
