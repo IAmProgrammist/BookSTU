@@ -1,0 +1,23 @@
+- name: deploy
+  hosts: localhost
+  connection: 82.97.246.215
+
+  tasks:
+    - name: create app dir
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/application"
+        state: directory
+    - name: copy .env
+      ansible.builtin.template:
+        src: example.env.j2
+        dest: "{{ ansible_env.HOME }}/application"
+    - name: copy docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml.j2
+        dest: "{{ ansible_env.HOME }}/application"
+    - name: start app
+      community.docker.docker_compose_v2:
+        project_src: "{{ ansible_env.HOME }}/application"
+        state: present
+        recreate: always
+
