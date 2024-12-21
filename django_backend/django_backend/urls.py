@@ -46,6 +46,7 @@ from django_backend.views.book_description import (
 )
 
 from django_backend.views.book import BookModelViewSet
+from django_backend.views.journal import JournalModelViewSet
 
 router.register(r"genres", GenreModelViewSet, 'genres')
 router.register(r"short-genres", GenreShortModelViewSet, 'short-genres')
@@ -56,6 +57,7 @@ router.register(r"short-publishing-houses", PublishingHouseShortModelViewSet, 's
 router.register(r"book-descriptions", BookDescriptionModelViewSet, 'book-descriptions')
 router.register(r"short-book-descriptions", BookDescriptionShortModelViewSet, 'short-book-descriptions')
 router.register(r"books", BookModelViewSet, 'books')
+router.register(r"journals", JournalModelViewSet, 'journals')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

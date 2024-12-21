@@ -2,7 +2,6 @@ from django.db import models
 from django_backend.models import (
     BookDescription
 )
-from django_backend.validators.book_description import validate_isbn
 
 
 class Book(models.Model):
