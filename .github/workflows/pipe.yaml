@@ -6,7 +6,7 @@ on:
       - fix-ci-cd
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v3
       - uses: docker/login-action@v1
@@ -17,27 +17,27 @@ jobs:
       - uses: int128/kaniko-action@v1
         with:
           push: true
-          tags: ghcr.io/${{ github.repository }}/backend:latest
+          tags: ghcr.io/${{ github.repository }}backend:latest
           cache: true
-          cache-repository: ghcr.io/${{ github.repository }}/backend/cache
+          cache-repository: ghcr.io/${{ github.repository }}backend/cache
           context: django_backend
       - uses: int128/kaniko-action@v1
         with:
           push: true
-          tags: ghcr.io/${{ github.repository }}/frontend:latest
+          tags: ghcr.io/${{ github.repository }}frontend:latest
           cache: true
-          cache-repository: ghcr.io/${{ github.repository }}/frontend/cache
+          cache-repository: ghcr.io/${{ github.repository }}frontend/cache
           context: react_frontend
       - uses: int128/kaniko-action@v1
         with:
           push: true
-          tags: ghcr.io/${{ github.repository }}/nginx:latest
+          tags: ghcr.io/${{ github.repository }}nginx:latest
           cache: true
-          cache-repository: ghcr.io/${{ github.repository }}/nginx/cache
+          cache-repository: ghcr.io/${{ github.repository }}nginx/cache
           context: nginx
   deploy:
-    runs-on: ubuntu-latest
-    steps:
+    runs-on: ubuntu-24.04
+    steps:  
       - uses: actions/checkout@v3
       - name: Setup SSH 
         shell: bash
