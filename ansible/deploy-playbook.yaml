@@ -1,7 +1,5 @@
 - name: deploy
-  hosts: localhost
-  connection: 82.97.246.215
-
+  hosts: all
   tasks:
     - name: create app dir
       ansible.builtin.file:

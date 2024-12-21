@@ -1,0 +1,51 @@
+name: Build and deploy
+run-name: ${{ github.actor }} is running build and deploy
+on:
+  branches:
+    - main
+jobs:
+  build:
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: int128/kaniko-action@v1
+        with:
+          push: true
+          tags: ghcr.io/${{ github.repository }}/backend:latest
+          cache: true
+          cache-repository: ghcr.io/${{ github.repository }}/backend/cache
+          context: django_backend
+      - uses: int128/kaniko-action@v1
+        with:
+          push: true
+          tags: ghcr.io/${{ github.repository }}/frontend:latest
+          cache: true
+          cache-repository: ghcr.io/${{ github.repository }}/frontend/cache
+          context: react_frontend
+      - uses: int128/kaniko-action@v1
+        with:
+          push: true
+          tags: ghcr.io/${{ github.repository }}/nginx:latest
+          cache: true
+          cache-repository: ghcr.io/${{ github.repository }}/nginx/cache
+          context: nginx
+  deploy:
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup SSH 
+        shell: bash
+        run: |
+         eval `ssh-agent -s`
+         mkdir -p ~/.ssh/
+         touch ~/.ssh/id_rsa
+         echo -e "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+         chmod 700 ~/.ssh/id_rsa
+      - name: Run ansible script
+        shell: bash 
+        run: |
+          cd ansible
+          ansible-playbook -i inventory.ini deploy-playbook.yml

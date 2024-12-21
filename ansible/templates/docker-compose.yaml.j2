@@ -2,9 +2,7 @@ version: "3.7"
 
 services:
   backend:
-    build:
-      context: ./django_backend
-      dockerfile: Dockerfile
+    image: ghcr.io/BookSTU/backend:latest
     volumes:
       - django_static_volume:/usr/src/app/static
       - django_media_volume:/usr/src/app/media
@@ -26,11 +24,7 @@ services:
     ports:
       - 5432:5432
   frontend:
-    build:
-      context: ./react_frontend
-      dockerfile: Dockerfile
-      args:
-        - API_SERVER=${ENV_API_SERVER}
+    image: ghcr.io/BookSTU/frontend:latest
     volumes:
       - react_static_volume:/usr/src/app/build/static
     hostname: frontend
@@ -44,7 +38,7 @@ services:
 
   nginx:
     restart: always
-    build: ./nginx
+    image: ghcr.io/BookSTU/nginx:latest
     volumes:
       - django_static_volume:/usr/src/app/django_files/static
       - django_media_volume:/usr/src/app/media
