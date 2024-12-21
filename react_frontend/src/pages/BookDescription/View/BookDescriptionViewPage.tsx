@@ -11,6 +11,7 @@ import { useSnackbar } from "notistack";
 import { usePermissions } from "hooks/usePermissions";
 import { ENV_API_SERVER } from "envconsts";
 import NoPhotographyIcon from '@mui/icons-material/NoPhotography';
+import { BookListPage } from "pages/Book/List";
 
 export function BookDescriptionViewPage() {
     const { bookDescriptionId } = useParams();
@@ -123,6 +124,8 @@ export function BookDescriptionViewPage() {
             <CardContent>
             </CardContent>
         </Card> : null}
+        <Typography variant="h4" sx={{alignSelf: "start"}}>Книги:</Typography>
+        <BookListPage/>
         <ConfirmationDialog
             id="book-description-delete"
             keepMounted

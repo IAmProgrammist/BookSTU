@@ -5,5 +5,6 @@ export const QUERY_TAGS = {
     Genre: "Genre",
     Author: "Author",
     BookDescription: "BookDescription",
-    PublishingHouse: "PublishingHouse"
+    PublishingHouse: "PublishingHouse",
+    Book: "Book"
 }

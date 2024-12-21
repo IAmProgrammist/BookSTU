@@ -12,6 +12,7 @@ import TheaterComedyIcon from '@mui/icons-material/TheaterComedy';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
 import ApartmentIcon from '@mui/icons-material/Apartment';
+import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 
 export function RouteHeader({ isProtected }: RouteHeaderProps) {
     const navigate = useNavigate();
@@ -56,7 +57,8 @@ export function RouteHeader({ isProtected }: RouteHeaderProps) {
                         { text: 'Библиотека', icon: <LibraryBooksIcon/>, to: "/book-descriptions" },
                         { text: 'Жанры', icon: <TheaterComedyIcon/>, to: "/genres" },
                         { text: 'Авторы', icon: <LocalLibraryIcon/>, to: "/authors" },
-                        { text: 'Издательства', icon: <ApartmentIcon/>, to: "/publishing-houses" }
+                        { text: 'Издательства', icon: <ApartmentIcon/>, to: "/publishing-houses" },
+                        { text: 'Книги', icon: <AutoStoriesIcon/>, to: "/books" }
                     ].map(({ text, icon, to }, index) => (
                         <ListItem key={text} disablePadding>
                             <ListItemButton onClick={() => navigate(to)}>

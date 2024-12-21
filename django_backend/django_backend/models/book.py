@@ -12,6 +12,7 @@ class Book(models.Model):
         WORN = "2", "Поношенная"
         UNDER_REPAIR = "3", "В ремонте"
         WRITTEN_OFF = "4", "Списана"
+        LOST = "5", "Утеряна"
 
     id = models.AutoField(primary_key=True)
     inventory_number = models.CharField(unique=True, blank=False, null=False)
