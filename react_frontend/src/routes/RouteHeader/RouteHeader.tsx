@@ -1,6 +1,6 @@
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { LC_AUTH_CALLBACK, LC_TOKEN, RouteHeaderProps } from "./types";
-import { Suspense, useCallback, useEffect } from "react";
+import { Suspense, useCallback, useEffect, useMemo } from "react";
 import React from "react";
 import { AppBar, Box, Button, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Toolbar, Typography } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
@@ -13,6 +13,8 @@ import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
+import PersonIcon from '@mui/icons-material/Person';
+import { usePermissions } from "hooks/usePermissions";
 
 export function RouteHeader({ isProtected }: RouteHeaderProps) {
     const navigate = useNavigate();
@@ -49,16 +51,24 @@ export function RouteHeader({ isProtected }: RouteHeaderProps) {
         setDrawerOpen(newOpen);
     };
 
+
+    const { data: permissions, isSuccess: permissionsIsSuccess } = usePermissions();
+
+    const shouldShowUsers = useMemo(() => {
+        return permissionsIsSuccess && permissions.findIndex((item) => item === "django_backend.view_profile") !== -1;
+    }, [permissions, permissionsIsSuccess]);
+
     return <>
         <Drawer open={drawerOpen} onClose={toggleDrawer(false)}>
             <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
                 <List>
                     {[
-                        { text: 'Библиотека', icon: <LibraryBooksIcon/>, to: "/book-descriptions" },
-                        { text: 'Жанры', icon: <TheaterComedyIcon/>, to: "/genres" },
-                        { text: 'Авторы', icon: <LocalLibraryIcon/>, to: "/authors" },
-                        { text: 'Издательства', icon: <ApartmentIcon/>, to: "/publishing-houses" },
-                        { text: 'Книги', icon: <AutoStoriesIcon/>, to: "/books" }
+                        { text: TITLE_MAP["/book-descriptions"]({}), icon: <LibraryBooksIcon />, to: "/book-descriptions" },
+                        { text: TITLE_MAP["/genres"]({}), icon: <TheaterComedyIcon />, to: "/genres" },
+                        { text: TITLE_MAP["/authors"]({}), icon: <LocalLibraryIcon />, to: "/authors" },
+                        { text: TITLE_MAP["/publishing-houses"]({}), icon: <ApartmentIcon />, to: "/publishing-houses" },
+                        { text: TITLE_MAP["/books"]({}), icon: <AutoStoriesIcon />, to: "/books" },
+                        ...(shouldShowUsers ? [{ text: TITLE_MAP["/users"]({}), icon: <PersonIcon />, to: "/users" }] : [])
                     ].map(({ text, icon, to }, index) => (
                         <ListItem key={text} disablePadding>
                             <ListItemButton onClick={() => navigate(to)}>
@@ -116,7 +126,7 @@ export function RouteHeader({ isProtected }: RouteHeaderProps) {
                         open={Boolean(anchorEl)}
                         onClose={handleClose}
                     >
-                        <MenuItem onClick={handleClose}>Мой профиль</MenuItem>
+                        <MenuItem onClick={() => navigate(`/users/${meData.user_id}`)}>Мой профиль</MenuItem>
                         <MenuItem onClick={logoutNoRedirect}>Выйти</MenuItem>
                     </Menu>
                 </div>}

@@ -26,6 +26,9 @@ import { BookUpdatePage } from "pages/Book/Update";
 import { JournalCreatePage } from "pages/Journal/Create";
 import { JournalUpdatePage } from "pages/Journal/Update/JournalUpdatePage";
 import { JournalViewPage } from "pages/Journal/View";
+import { UserListPage } from "pages/User/List";
+import { UserViewPage } from "pages/User/View";
+import { UserUpdatePage } from "pages/User/Update/UserUpdatePage";
 
 export const TITLE_MAP: { [key in string]: (params: Params<string>) => string } = {
     "/home": () => "Домашняя страница",
@@ -46,7 +49,7 @@ export const TITLE_MAP: { [key in string]: (params: Params<string>) => string } 
     "/authors/:authorId": ({ authorId }) => `Автор ${authorId}`,
     "/authors/:authorId/update": ({ authorId }) => `Обновить автора ${authorId}`,
 
-    "/book-descriptions": () => "Описание книги",
+    "/book-descriptions": () => "Описания книг",
     "/book-descriptions/create": () => "Создать описание книги",
     "/book-descriptions/:bookDescriptionId": ({ bookDescriptionId }) => `Описание книги ${bookDescriptionId}`,
     "/book-descriptions/:bookDescriptionId/update": ({ bookDescriptionId }) => `Обновить описание книги ${bookDescriptionId}`,
@@ -59,6 +62,10 @@ export const TITLE_MAP: { [key in string]: (params: Params<string>) => string } 
     "/books/:bookId/journals/create": ({bookId}) => `Добавить запись в журнал для книги ${bookId}`,
     "/journals/:journalId/update": ({journalId}) => `Обновить запись журнала ${journalId}`,
     "/journals/:journalId": ({journalId}) => `Запись журнала ${journalId}`,
+
+    "/users": () => "Пользователи",
+    "/users/:userId": ({userId}) => `Пользователь ${userId}`,
+    "/users/:userId/update": ({userId}) => `Обновить пользователя ${userId}`,
 }
 
 export function AppRoutes() {
@@ -88,6 +95,10 @@ export function AppRoutes() {
                 { path: '/books/:bookId/journals/create', element: <JournalCreatePage /> },
                 { path: '/journals/:journalId/update', element: <JournalUpdatePage /> },
                 { path: '/journals/:journalId', element: <JournalViewPage /> },
+
+                { path: '/users', element: <UserListPage/> },
+                { path: '/users/:userId', element: <UserViewPage/> },
+                { path: '/users/:userId/update', element: <UserUpdatePage/> },
 
             ]
         },

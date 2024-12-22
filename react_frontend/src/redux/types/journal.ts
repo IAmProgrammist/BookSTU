@@ -1,7 +1,7 @@
 import { PageableListQuery, PageableListResponse, SearcheableListQuery, SortableListQuery } from "./base"
 import { Book } from "./book"
 import { CSRFMiddlewareTokenQueryFormMixin } from "./csrf"
-import { UserMe } from "./user"
+import { User, UserMe } from "./user"
 
 // Базовые модели
 export interface Journal {
@@ -16,6 +16,7 @@ export interface Journal {
 // Запросы
 export interface JournalListQuery extends PageableListQuery, SortableListQuery {
     book?: Book["id"]
+    user?: User["id"]
 }
 
 export interface JournalQuery {
