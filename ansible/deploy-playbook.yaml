@@ -10,7 +10,7 @@
 
     - name: Restart Docker
       ansible.builtin.service:
-        name: docker
+        name: snap.docker.dockerd
         state: restarted
       become: yes
 
