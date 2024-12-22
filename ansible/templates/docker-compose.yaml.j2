@@ -28,7 +28,7 @@ services:
   frontend:
     image: ghcr.io/iamprogrammist/bookstu/frontend:latest
     volumes:
-      - react_static_volume:nginx
+      - react_static_volume:/nginx
     hostname: frontend
     expose:
       - 3000
