@@ -9,6 +9,7 @@ import { endpoints as genreEndpoints } from "./genre";
 import { endpoints as publishingHouseEndpoints } from "./publishingHouse";
 import { endpoints as filesEndpoints } from "./file";
 import { endpoints as booksEndpoints } from "./book";
+import { endpoints as journalsEndpoints } from "./journal";
 
 export type BaseApiBuilder = EndpointBuilder<(args: any, api: any, extraOptions: any) => Promise<QueryReturnValue<unknown, FetchBaseQueryError, FetchBaseQueryMeta>>, string, "baseApi">
 
@@ -41,6 +42,9 @@ export const baseApi = createApi({
 })).injectEndpoints(({
     endpoints: booksEndpoints,
     overrideExisting: false
+})).injectEndpoints(({
+    endpoints: journalsEndpoints,
+    overrideExisting: false
 }));
 
 export const {
@@ -51,27 +55,32 @@ export const {
     useGetGenreListQuery,
     useGetBookListQuery,
     useGetPublishingHouseListQuery,
+    useGetJournalListQuery,
     useGetAuthorQuery,
     useGetBookDescriptionQuery,
     useGetGenreQuery,
     useGetPublishingHouseQuery,
     useGetBookQuery,
+    useGetJournalQuery,
     useCreateAuthorMutation,
     useCreateBookDescriptionMutation,
     useCreateGenreMutation,
     useCreatePublishingHouseMutation,
     useCreateFileMutation,
     useCreateBookMutation,
+    useCreateJournalMutation,
     useUpdateAuthorMutation,
     useUpdateBookDescriptionMutation,
     useUpdateGenreMutation,
     useUpdatePublishingHouseMutation,
     useUpdateBookMutation,
+    useUpdateJournalMutation,
     useDeleteAuthorMutation,
     useDeleteBookDescriptionMutation,
     useDeleteGenreMutation,
     useDeletePublishingHouseMutation,
     useDeleteBookMutation,
+    useDeleteJournalMutation,
     useSignupUserMutation,
     useLoginUserMutation,
     useLogoutUserMutation

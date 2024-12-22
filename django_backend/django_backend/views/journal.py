@@ -18,7 +18,7 @@ class JournalModelViewSet(viewsets.ModelViewSet):
         OrderingFilter,
     )
     permission_classes = (JournalPermission,)
-    ordering_fields = "begin_date"
+    ordering_fields = ["begin_date"]
 
     def perform_create(self, serializer):
         # Здесь проверим, что последняя запись либо отсутствует и не null
