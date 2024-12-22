@@ -28,7 +28,6 @@ import { JournalUpdatePage } from "pages/Journal/Update/JournalUpdatePage";
 import { JournalViewPage } from "pages/Journal/View";
 import { UserListPage } from "pages/User/List";
 import { UserViewPage } from "pages/User/View";
-import { UserUpdatePage } from "pages/User/Update/UserUpdatePage";
 
 export const TITLE_MAP: { [key in string]: (params: Params<string>) => string } = {
     "/home": () => "Домашняя страница",
@@ -98,8 +97,6 @@ export function AppRoutes() {
 
                 { path: '/users', element: <UserListPage/> },
                 { path: '/users/:userId', element: <UserViewPage/> },
-                { path: '/users/:userId/update', element: <UserUpdatePage/> },
-
             ]
         },
         {

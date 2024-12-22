@@ -23,6 +23,8 @@ import { useDebounce } from "hooks/useDebounce";
 import { BookDescription } from "../../../redux/types/bookDescription";
 import { Whoops } from "components/Whoops";
 
+const PAGE_SIZE = 15;
+
 export function BookDescriptionUpdatePage() {
     const { bookDescriptionId } = useParams();
 
@@ -32,7 +34,7 @@ export function BookDescriptionUpdatePage() {
     const { data: genresData, isLoading: genresIsLoading } = useGetGenreListQuery({
         q: debouncedGenreLocalStr.val,
         short: true,
-        size: 15
+        size: PAGE_SIZE
     });
     const mergedGenresOptions = genresSelected.concat((genresData?.results || []).filter((item) =>
         !genresSelected.some((item1) => item1.id === item.id)
@@ -44,7 +46,7 @@ export function BookDescriptionUpdatePage() {
     const { data: authorsData, isLoading: authorsIsLoading } = useGetAuthorListQuery({
         q: debouncedAuthorLocalStr.val,
         short: true,
-        size: 15
+        size: PAGE_SIZE
     });
     const mergedAuthorsOptions = authorsSelected.concat((authorsData?.results || []).filter((item) =>
         !authorsSelected.some((item1) => item1.id === item.id)
@@ -56,7 +58,7 @@ export function BookDescriptionUpdatePage() {
     const { data: publishingHousesData, isLoading: publishingHousesIsLoading } = useGetPublishingHouseListQuery({
         q: debouncedPublishingHouseLocalStr.val,
         short: true,
-        size: 15
+        size: PAGE_SIZE
     });
     const mergedPublishingHousesOptions = publishingHousesSelected.concat((publishingHousesData?.results || []).filter((item) =>
         !publishingHousesSelected.some((item1) => item1.id === item.id)

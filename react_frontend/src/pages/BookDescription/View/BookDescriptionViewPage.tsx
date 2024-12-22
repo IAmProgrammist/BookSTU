@@ -12,6 +12,7 @@ import { usePermissions } from "hooks/usePermissions";
 import { ENV_API_SERVER } from "envconsts";
 import NoPhotographyIcon from '@mui/icons-material/NoPhotography';
 import { BookListPage } from "pages/Book/List";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 export function BookDescriptionViewPage() {
     const { bookDescriptionId } = useParams();
@@ -63,6 +64,7 @@ export function BookDescriptionViewPage() {
     return <Container sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", gap: 3 }}>
         <Box sx={{ width: "100%", display: "flex" }}>
             <Box sx={{ flexGrow: 1, display: "flex", gap: 1 }}>
+                <Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/book-descriptions")}>К описанию книг</Button>
             </Box>
             <Box sx={{ display: "flex", gap: 1 }}>
                 {shouldShowUpdate && <Button onClick={() => navigate(`/book-descriptions/${bookDescriptionId}/update`)}>Обновить</Button>}
@@ -124,8 +126,8 @@ export function BookDescriptionViewPage() {
             <CardContent>
             </CardContent>
         </Card> : null}
-        <Typography variant="h4" sx={{alignSelf: "start"}}>Книги:</Typography>
-        <BookListPage/>
+        <Typography variant="h4" sx={{ alignSelf: "start" }}>Книги:</Typography>
+        <BookListPage />
         <ConfirmationDialog
             id="book-description-delete"
             keepMounted

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDeleteJournalMutation, useGetBookDescriptionQuery, useGetBookQuery, useGetCSRFQuery, useGetJournalQuery, useGetUserListQuery } from "../../../redux/api/baseApi";
-import { Box, Button, Card, CardContent, CardHeader, CircularProgress, Container, Stack, Typography } from "@mui/material";
+import { Box, Button, Card, CardActionArea, CardContent, CardHeader, CircularProgress, Container, Stack, Typography } from "@mui/material";
 import { useShowError } from "hooks/ShowError";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSnackbar } from "notistack";
@@ -106,27 +106,31 @@ export function JournalViewPage() {
         {isError ? <Whoops /> :
             isLoading ? <CircularProgress /> : <></>}
         {isSuccess ? <Stack sx={{ width: "100%" }} spacing={2}>
-            <Card variant="outlined">
-                <CardHeader
-                    title={<>{bookDescriptionStatus.isSuccess ? bookDescriptionData?.name : "Загрузка..."}</>}
-                    subheader={<>{bookDescriptionStatus.isSuccess ? `ISBN: ${bookDescriptionData?.isbn}` : ""}<br />
-                        {bookStatus.isSuccess ? `Инвентарный номер: ${bookData.inventory_number}` : ""}<br />
-                        {bookStatus.isSuccess ? `Состояние: ${BOOK_STATE_NAMES[bookData.state]}` : ""}</>} />
+            <Card sx={{ width: "100%" }} variant="outlined">
+                <CardActionArea onClick={() => navigate(`/book-descriptions/${bookData?.description}`)}>
+                    <CardHeader
+                        title={<>{bookDescriptionStatus.isSuccess ? bookDescriptionData?.name : "Загрузка..."}</>}
+                        subheader={<>{bookDescriptionStatus.isSuccess ? `ISBN: ${bookDescriptionData?.isbn}` : ""}<br />
+                            {bookStatus.isSuccess ? `Инвентарный номер: ${bookData.inventory_number}` : ""}<br />
+                            {bookStatus.isSuccess ? `Состояние: ${BOOK_STATE_NAMES[bookData.state]}` : ""}</>} />
+                </CardActionArea>
             </Card>
             <Card variant="outlined">
-                <CardHeader
-                    title={<>{!!usersSelected.length ? `${usersSelected[0].surname} ${usersSelected[0].name} ${usersSelected[0].patronymics}` : "Загрузка..."}</>}
-                    subheader={<>{!!usersSelected.length ? `+7${usersSelected[0].phone_number}` : ""}<br />
-                        {!!usersSelected.length ? `${usersSelected[0].user.username}` : ""}</>} />
+                <CardActionArea onClick={() => navigate(`/users/${usersSelected[0].user.id}`)}>
+                    <CardHeader
+                        title={<>{!!usersSelected.length ? `${usersSelected[0].surname} ${usersSelected[0].name} ${usersSelected[0].patronymics}` : "Загрузка..."}</>}
+                        subheader={<>{!!usersSelected.length ? `+7${usersSelected[0].phone_number}` : ""}<br />
+                            {!!usersSelected.length ? `${usersSelected[0].user.username}` : ""}</>} />
+                </CardActionArea>
             </Card>
             <Card sx={{ width: "100%" }}>
                 <CardContent>
-                    <Stack spacing={3}>
+                    <Stack spacing={1}>
                         <Typography variant="body1">Выдано: {dayjs(journalData.begin_date).format("DD.MM.YYYY hh:mm")}</Typography>
                         <Typography variant="body1">Ожидается до: {dayjs(journalData.end_date).format("DD.MM.YYYY hh:mm")}</Typography>
-                        <Typography variant="body1">{journalData.returned_date ? `Вовзращена ${dayjs(journalData.returned_date).format("DD.MM.YYYY hh:mm")}` : 
-                        "Пока ещё читается"}</Typography>
-                        {isExpired ? <Typography sx={{color: "red"}}>Просрочена</Typography> : null}
+                        <Typography variant="body1">{journalData.returned_date ? `Вовзращена ${dayjs(journalData.returned_date).format("DD.MM.YYYY hh:mm")}` :
+                            "Пока ещё читается"}</Typography>
+                        {isExpired ? <Typography sx={{ color: "red" }}>Просрочена</Typography> : null}
                     </Stack>
                 </CardContent>
             </Card></Stack> : null}

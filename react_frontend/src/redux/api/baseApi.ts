@@ -87,5 +87,6 @@ export const {
     useDeleteUserMutation,
     useSignupUserMutation,
     useLoginUserMutation,
-    useLogoutUserMutation
+    useLogoutUserMutation,
+    usePatchUserMutation,
 } = baseApi;

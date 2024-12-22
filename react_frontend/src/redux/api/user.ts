@@ -79,6 +79,16 @@ export const endpoints = (builder: BaseApiBuilder) => ({
             { type: QUERY_TAGS.User, id: arg.id }
         ]
     }),
+    patchUser: builder.mutation<UserUpdateResponse, Partial<UserUpdateQuery>>({
+        query: ({ id, ...data }) => ({
+            url: withQueryParams(`/${usersBase}/${id}/`, {}),
+            method: "PATCH",
+            body: constructFormData(data)
+        }),
+        invalidatesTags: (_result, _error, arg) => [
+            { type: QUERY_TAGS.User, id: arg.id }
+        ]
+    }),
     deleteUser: builder.mutation<UserDeleteResponse, UserDeleteQuery>({
         query: ({ id }) => ({
             url: withQueryParams(`/${usersBase}/${id}/`, {}),

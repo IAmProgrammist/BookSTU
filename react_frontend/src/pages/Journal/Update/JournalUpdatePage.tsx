@@ -15,6 +15,8 @@ import { useDebounce } from "hooks/useDebounce";
 import 'dayjs/locale/ru'
 import dayjs from "dayjs";
 
+const PAGE_SIZE = 15;
+
 export function JournalUpdatePage() {
     const { journalId } = useParams();
     const { data: csrfData } = useGetCSRFQuery({});
@@ -116,7 +118,7 @@ export function JournalUpdatePage() {
     const debouncedPublishingHouseLocalStr = useDebounce(publishingHouseLocalStr);
     const { data: usersData, isLoading: usersIsLoading } = useGetUserListQuery({
         q: debouncedPublishingHouseLocalStr.val,
-        size: 15,
+        size: PAGE_SIZE,
         banned: false
     });
     const mergedUsersOptions = usersSelected.concat((usersData?.results || []).filter((item) =>

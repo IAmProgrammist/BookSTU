@@ -12,6 +12,7 @@ import { usePermissions } from "hooks/usePermissions";
 import { ENV_API_SERVER } from "envconsts";
 import NoPhotographyIcon from '@mui/icons-material/NoPhotography';
 import { SP_ROOT } from "hooks/SearchParamsFilter";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 export function PublishingHouseViewPage() {
     const { publishingHouseId } = useParams();
@@ -65,6 +66,7 @@ export function PublishingHouseViewPage() {
     return <Container sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", gap: 3 }}>
         <Box sx={{ width: "100%", display: "flex" }}>
             <Box sx={{ flexGrow: 1, display: "flex", gap: 1 }}>
+                <Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/publishing-houses")}>К издательствам</Button>
             </Box>
             <Box sx={{ display: "flex", gap: 1 }}>
                 {shouldShowUpdate ? <Button onClick={() => navigate(`/publishing-houses/${publishingHouseId}/update`)}>Обновить</Button> : null}

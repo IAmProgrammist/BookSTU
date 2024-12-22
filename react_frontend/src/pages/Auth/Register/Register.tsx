@@ -7,11 +7,11 @@ import { useGetCSRFQuery, useSignupUserMutation } from "../../../redux/api/baseA
 import { useShowError } from "hooks/ShowError";
 import { LC_AUTH_CALLBACK } from "routes/RouteHeader";
 
-const NAME_PATTERN = /^[А-Яа-яЁёA-Za-z-]*$/
-const PASSPORT_PATTERN = /^[0-9]{10}$/
-const PHONE_PATTERN = /^\d{10}$/
-const EMAIL_PATTERN = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/
-const PASSWORD_PATTERN = /^.{6,}$/
+export const NAME_PATTERN = /^[А-Яа-яЁёA-Za-z-]*$/
+export const PASSPORT_PATTERN = /^[0-9]{10}$/
+export const PHONE_PATTERN = /^\d{10}$/
+export const EMAIL_PATTERN = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/
+export const PASSWORD_PATTERN = /^.{6,}$/
 
 export function RegisterPage() {
     const navigate = useNavigate();

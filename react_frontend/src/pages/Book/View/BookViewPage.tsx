@@ -12,6 +12,7 @@ import { BOOK_STATE_NAMES } from "dicts";
 import { useSearchParamsFilter } from "hooks/SearchParamsFilter";
 import { JournalListQuery } from "redux/types/journal";
 import dayjs from "dayjs";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 
 const PAGE_SIZE = 15;
@@ -77,13 +78,14 @@ export function BookViewPage() {
     const { data: journalData, ...journalDataStatus } = useGetJournalListQuery({
         ordering: params?.ordering,
         page: params?.page,
-        size: 15,
+        size: PAGE_SIZE,
         book: bookId,
     }, { skip: !shouldShowJournal })
 
     return <Container sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", gap: 3 }}>
         <Box sx={{ width: "100%", display: "flex" }}>
             <Box sx={{ flexGrow: 1, display: "flex", gap: 1 }}>
+                <Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/books")}>К списку книг</Button>
             </Box>
             <Box sx={{ display: "flex", gap: 1 }}>
                 {shouldShowUpdate && <Button onClick={() => navigate(`/books/${bookId}/update`)}>Обновить</Button>}
@@ -94,9 +96,11 @@ export function BookViewPage() {
             isLoading ? <CircularProgress /> : <></>}
         {isSuccess ? <>
             <Card sx={{ width: "100%" }} variant="outlined">
-                <CardHeader
-                    title={bookDescriptionStatus.isLoading ? "Загрузка..." : bookDescriptionData.name}
-                    subheader={bookDescriptionStatus.isLoading ? "" : `ISBN: ${bookDescriptionData.isbn}`} />
+                <CardActionArea onClick={() => navigate(`/book-descriptions/${data?.description}`)}>
+                    <CardHeader
+                        title={bookDescriptionStatus.isLoading ? "Загрузка..." : bookDescriptionData.name}
+                        subheader={bookDescriptionStatus.isLoading ? "" : `ISBN: ${bookDescriptionData.isbn}`} />
+                </CardActionArea>
             </Card>
             <Card sx={{ width: "100%" }}>
                 <CardContent>
@@ -137,7 +141,7 @@ export function BookViewPage() {
                     {journalDataStatus.isSuccess ? (journalData.results.length == 0 ? <Whoops title="Записей в журнале не найдено" description="Возможно, Вы даже пополните этот ещё пополняющийся список" /> :
                         <Box sx={{
                             display: "grid",
-                            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr));",
+                            gridTemplateColumns: "repeat(auto-fit, 1fr);",
                             gap: 2,
                             width: "100%",
                             my: 4
@@ -145,10 +149,11 @@ export function BookViewPage() {
                             {journalData.results.map((item) => <Card variant="outlined" key={item.id}>
                                 <CardActionArea onClick={() => navigate(`/journals/${item.id}`)}>
                                     <CardContent>
-                                        <Stack spacing={3}>
+                                        <Stack spacing={1}>
                                             <Typography variant="body1">Выдано: {dayjs(item.begin_date).format("DD.MM.YYYY hh:mm")}</Typography>
                                             <Typography variant="body1">Ожидается до: {dayjs(item.end_date).format("DD.MM.YYYY hh:mm")}</Typography>
                                             <Typography variant="body1">{item.returned_date ? `Вовзращена ${dayjs(item.returned_date).format("DD.MM.YYYY hh:mm")}` : "Пока ещё читается"}</Typography>
+                                            {dayjs(item?.end_date).diff(dayjs(item?.returned_date)) < 0 ? <Typography sx={{ color: "red" }}>Просрочена</Typography> : null}
                                         </Stack>
                                     </CardContent>
                                 </CardActionArea>

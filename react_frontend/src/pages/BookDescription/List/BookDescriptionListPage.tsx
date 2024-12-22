@@ -23,7 +23,7 @@ export function BookDescriptionListPage() {
     const { data: genresData, isLoading: genresIsLoading } = useGetGenreListQuery({
         q: debouncedGenreLocalStr.val,
         short: true,
-        size: 15
+        size: PAGE_SIZE
     });
     const mergedGenresOptions = genresSelected.concat((genresData?.results || []).filter((item) =>
         !genresSelected.some((item1) => item1.id === item.id)
@@ -39,7 +39,7 @@ export function BookDescriptionListPage() {
     const { data: authorsData, isLoading: authorsIsLoading } = useGetAuthorListQuery({
         q: debouncedAuthorLocalStr.val,
         short: true,
-        size: 15
+        size: PAGE_SIZE
     });
     const mergedAuthorsOptions = authorsSelected.concat((authorsData?.results || []).filter((item) =>
         !authorsSelected.some((item1) => item1.id === item.id)
@@ -55,7 +55,7 @@ export function BookDescriptionListPage() {
     const { data: publishingHousesData, isLoading: publishingHousesIsLoading } = useGetPublishingHouseListQuery({
         q: debouncedPublishingHouseLocalStr.val,
         short: true,
-        size: 15
+        size: PAGE_SIZE
     });
     const mergedPublishingHousesOptions = publishingHousesSelected.concat((publishingHousesData?.results || []).filter((item) =>
         !publishingHousesSelected.some((item1) => item1.id === item.id)
