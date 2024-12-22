@@ -44,7 +44,7 @@ class JournalModelViewSet(viewsets.ModelViewSet):
         # Дополнительно фильтруем queryset так чтобы если у нас не было разрешения,
         # то мы могли бы просматривать только свои записи в журнале
         if not (request.user.is_superuser or request.user.has_perm("django_backend.view_journal")):
-            queryset = queryset.filter(user=request.user)
+            queryset = queryset.filter(user__user=request.user)
 
         for journal in queryset.select_related("book").select_related("user"):
             writer.writerow([journal.begin_date, journal.end_date, journal.returned_date,
@@ -63,7 +63,7 @@ class JournalModelViewSet(viewsets.ModelViewSet):
         if request.method == "GET" and request.path == "/api/journals/" and not (
             request.user.is_superuser or request.user.has_perm("django_backend.view_journal")
         ):
-            queryset = queryset.filter(user=request.user)
+            queryset = queryset.filter(user__user=request.user)
 
         # Продолжаем обычную логику запроса
         page = self.paginate_queryset(queryset)
