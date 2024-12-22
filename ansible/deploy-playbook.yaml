@@ -37,10 +37,12 @@
     - debug:
         var: compose_file_status.stat.exists
     
-    - name: Log in to GitHub Container Registry
-      ansible.builtin.shell: |
-        echo "{{ lookup('env', 'GHCR_PAT') }}" | docker login ghcr.io -u {{ lookup('env', 'GITHUB_ACTOR') }} --password-stdin
-      become: yes
+    - name: Log into private registry and force re-authorization
+      docker_login:
+        registry: ghcr.io
+        username: Exophyray
+        password: "{{ lookup('env', GHCR_PAT) }}"
+        reauthorize: yes
     
     - name: Pull backend image
       ansible.builtin.shell: docker pull ghcr.io/bookstu/backend:latest
