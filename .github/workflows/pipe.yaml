@@ -17,23 +17,23 @@ jobs:
       - uses: int128/kaniko-action@v1
         with:
           push: true
-          tags: ghcr.io/${{ github.repository }}/backend:latest
+          tags: ghcr.io/${{ github.repository | toLowerCase }}/backend:latest
           cache: true
-          cache-repository: ghcr.io/${{ github.repository }}/backend/cache
+          cache-repository: ghcr.io/${{ github.repository | toLowerCase }}/backend/cache
           context: django_backend
       - uses: int128/kaniko-action@v1
         with:
           push: true
-          tags: ghcr.io/${{ github.repository }}/frontend:latest
+          tags: ghcr.io/${{ github.repository | toLowerCase }}/frontend:latest
           cache: true
-          cache-repository: ghcr.io/${{ github.repository }}/frontend/cache
+          cache-repository: ghcr.io/${{ github.repository | toLowerCase }}/frontend/cache
           context: react_frontend
       - uses: int128/kaniko-action@v1
         with:
           push: true
-          tags: ghcr.io/${{ github.repository }}/nginx:latest
+          tags: ghcr.io/${{ github.repository | toLowerCase }}/nginx:latest
           cache: true
-          cache-repository: ghcr.io/${{ github.repository }}/nginx/cache
+          cache-repository: ghcr.io/${{ github.repository | toLowerCase }}/nginx/cache
           context: nginx
   deploy:
     runs-on: ubuntu-24.04
