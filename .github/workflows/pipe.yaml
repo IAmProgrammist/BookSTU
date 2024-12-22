@@ -23,7 +23,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and Push Backend
+      - name: Build and Push backend
         uses: int128/kaniko-action@v1
         with:
           push: true
@@ -32,7 +32,7 @@ jobs:
           cache-repository: ghcr.io/${{ env.REPO_NAME }}/backend/cache
           context: django_backend
 
-      - name: Build and Push Frontend
+      - name: Build and Push frontend
         uses: int128/kaniko-action@v1
         with:
           push: true
@@ -41,7 +41,7 @@ jobs:
           cache-repository: ghcr.io/${{ env.REPO_NAME }}/frontend/cache
           context: react_frontend
 
-      - name: Build and Push Nginx
+      - name: Build and Push nginx
         uses: int128/kaniko-action@v1
         with:
           push: true
