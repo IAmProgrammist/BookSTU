@@ -30,11 +30,9 @@ services:
     volumes:
       - react_static_volume:/usr/src/app/build/static
     hostname: frontend
-    expose:
-      - 3000
     env_file:
       - .env
-    command: serve -s build -l 3000
+    command: cp -r /usr/src/app/build/ /nginx/
     links:
       - backend
 
