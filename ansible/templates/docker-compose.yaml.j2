@@ -9,6 +9,8 @@ services:
     hostname: backend
     expose:
       - 8000
+    env_file:
+      - .env
     command: ./entrypoint.sh
     links:
       - database
