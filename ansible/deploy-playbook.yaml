@@ -56,10 +56,6 @@
       ansible.builtin.shell: docker pull ghcr.io/iamprogrammist/bookstu/nginx:latest
       become: yes
 
-    - name: Pull database image
-      ansible.builtin.shell: docker pull ghcr.io/iamprogrammist/bookstu/database:latest
-      become: yes
-
     - name: start app
       community.docker.docker_compose_v2:
         project_src: "{{ ansible_env.HOME }}/application"
