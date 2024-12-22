@@ -7,39 +7,46 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04
-    env:
-      LOWERCASE_REPO_NAME: ${{ github.repository | toJSON() | fromJson() | lower() }}
     steps:
       - uses: actions/checkout@v3
+
+      - name: Set Repository Name to Lowercase
+        id: set_repo_name
+        run: echo "REPO_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - uses: docker/login-action@v1
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build and Push Backend
         uses: int128/kaniko-action@v1
         with:
           push: true
-          tags: ghcr.io/${{ env.LOWERCASE_REPO_NAME }}/backend:latest
+          tags: ghcr.io/${{ env.REPO_NAME }}/backend:latest
           cache: true
-          cache-repository: ghcr.io/${{ env.LOWERCASE_REPO_NAME }}/backend/cache
+          cache-repository: ghcr.io/${{ env.REPO_NAME }}/backend/cache
           context: django_backend
+
       - name: Build and Push Frontend
         uses: int128/kaniko-action@v1
         with:
           push: true
-          tags: ghcr.io/${{ env.LOWERCASE_REPO_NAME }}/frontend:latest
+          tags: ghcr.io/${{ env.REPO_NAME }}/frontend:latest
           cache: true
-          cache-repository: ghcr.io/${{ env.LOWERCASE_REPO_NAME }}/frontend/cache
+          cache-repository: ghcr.io/${{ env.REPO_NAME }}/frontend/cache
           context: react_frontend
+
       - name: Build and Push Nginx
         uses: int128/kaniko-action@v1
         with:
           push: true
-          tags: ghcr.io/${{ env.LOWERCASE_REPO_NAME }}/nginx:latest
+          tags: ghcr.io/${{ env.REPO_NAME }}/nginx:latest
           cache: true
-          cache-repository: ghcr.io/${{ env.LOWERCASE_REPO_NAME }}/nginx/cache
+          cache-repository: ghcr.io/${{ env.REPO_NAME }}/nginx/cache
           context: nginx
+
   deploy:
     runs-on: ubuntu-24.04
     steps:
