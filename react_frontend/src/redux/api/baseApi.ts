@@ -8,6 +8,8 @@ import { endpoints as bookDescriptionEndpoints } from "./bookDescription";
 import { endpoints as genreEndpoints } from "./genre";
 import { endpoints as publishingHouseEndpoints } from "./publishingHouse";
 import { endpoints as filesEndpoints } from "./file";
+import { endpoints as booksEndpoints } from "./book";
+import { endpoints as journalsEndpoints } from "./journal";
 
 export type BaseApiBuilder = EndpointBuilder<(args: any, api: any, extraOptions: any) => Promise<QueryReturnValue<unknown, FetchBaseQueryError, FetchBaseQueryMeta>>, string, "baseApi">
 
@@ -37,7 +39,13 @@ export const baseApi = createApi({
 })).injectEndpoints(({
     endpoints: filesEndpoints,
     overrideExisting: false
-}))
+})).injectEndpoints(({
+    endpoints: booksEndpoints,
+    overrideExisting: false
+})).injectEndpoints(({
+    endpoints: journalsEndpoints,
+    overrideExisting: false
+}));
 
 export const {
     useGetCSRFQuery,
@@ -45,25 +53,40 @@ export const {
     useGetAuthorListQuery,
     useGetBookDescriptionListQuery,
     useGetGenreListQuery,
+    useGetBookListQuery,
     useGetPublishingHouseListQuery,
+    useGetJournalListQuery,
+    useGetUserListQuery,
     useGetAuthorQuery,
     useGetBookDescriptionQuery,
     useGetGenreQuery,
     useGetPublishingHouseQuery,
+    useGetBookQuery,
+    useGetJournalQuery,
+    useGetUserQuery,
     useCreateAuthorMutation,
     useCreateBookDescriptionMutation,
     useCreateGenreMutation,
     useCreatePublishingHouseMutation,
     useCreateFileMutation,
+    useCreateBookMutation,
+    useCreateJournalMutation,
     useUpdateAuthorMutation,
     useUpdateBookDescriptionMutation,
     useUpdateGenreMutation,
     useUpdatePublishingHouseMutation,
+    useUpdateBookMutation,
+    useUpdateJournalMutation,
+    useUpdateUserMutation,
     useDeleteAuthorMutation,
     useDeleteBookDescriptionMutation,
     useDeleteGenreMutation,
     useDeletePublishingHouseMutation,
+    useDeleteBookMutation,
+    useDeleteJournalMutation,
+    useDeleteUserMutation,
     useSignupUserMutation,
     useLoginUserMutation,
-    useLogoutUserMutation
+    useLogoutUserMutation,
+    usePatchUserMutation,
 } = baseApi;

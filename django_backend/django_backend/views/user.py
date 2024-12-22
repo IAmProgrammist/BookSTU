@@ -11,6 +11,16 @@ from django.middleware.csrf import get_token
 
 from django_backend.models import Profile
 
+from django_backend.serializers import ProfileSerializer
+from rest_framework import viewsets
+from django_backend.pagintaion import CustomPagination
+from django_filters import rest_framework as filters
+from django_backend.filters import ProfileFilter
+from rest_framework.filters import OrderingFilter
+from rest_framework import viewsets, mixins
+from django_backend.permissions import ProfilePermission
+from rest_framework.decorators import action
+
 
 @require_http_methods(["POST"])
 def user_signup(request):
@@ -84,29 +94,42 @@ def user_logout(request):
     return JsonResponse({})
 
 
-@require_http_methods(["GET"])
-def session_view(request):
-    if not request.user.is_authenticated:
-        return JsonResponse({'is_authenticated': False})
+class ProfileModelViewSet(mixins.RetrieveModelMixin,
+                          mixins.UpdateModelMixin,
+                          mixins.DestroyModelMixin,
+                          mixins.ListModelMixin,
+                          viewsets.GenericViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    pagination_class = CustomPagination
+    filterset_class = ProfileFilter
+    filter_backends = (filters.DjangoFilterBackend, OrderingFilter,)
+    permission_classes = (ProfilePermission,)
+    ordering_fields = ('surname', 'banned', 'user__username')
 
-    this_profile = Profile.objects.get(user=request.user)
-    if not this_profile:
-        return JsonResponse({"message": "Unable to find profile"}, status=400)
+    @action(detail=False, methods=['GET'])
+    def me(self, request):
+        if not request.user.is_authenticated:
+            return JsonResponse({'is_authenticated': False})
 
-    permissions = request.user.get_all_permissions()
+        this_profile = Profile.objects.get(user=request.user)
+        if not this_profile:
+            return JsonResponse({"message": "Unable to find profile"}, status=400)
 
-    return JsonResponse({
-        'is_authenticated': True,
-        'username': this_profile.name,
-        'surname': this_profile.surname,
-        'patronymics': this_profile.patronymics,
-        'passport_data': this_profile.passport_data,
-        'phone_number': this_profile.phone_number,
-        'banned': this_profile.banned,
-        'user_id': request.user.id,
-        'email': request.user.username,
-        'permissions': [str(permission) for permission in permissions]
-    }, status=200)
+        permissions = request.user.get_all_permissions()
+
+        return JsonResponse({
+            'is_authenticated': True,
+            'username': this_profile.name,
+            'surname': this_profile.surname,
+            'patronymics': this_profile.patronymics,
+            'passport_data': this_profile.passport_data,
+            'phone_number': this_profile.phone_number,
+            'banned': this_profile.banned,
+            'user_id': request.user.id,
+            'email': request.user.username,
+            'permissions': [str(permission) for permission in permissions]
+        }, status=200)
 
 
 urlpatterns = [
@@ -114,5 +137,4 @@ urlpatterns = [
     url(r'^api/login/$', user_login, name='login'),
     url(r'^api/logout/$', user_logout, name='logout'),
     url(r'^api/csrf/$', csrf_ensure, name='csrf_ensure'),
-    url(r'^api/users/me/$', session_view, name='session_view'),
 ]
