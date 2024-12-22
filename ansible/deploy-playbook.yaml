@@ -1,6 +1,13 @@
 - name: deploy
   hosts: all
   tasks:
+    - name: Ensure ansible user is in the Docker group
+      ansible.builtin.user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+      become: yes
+
     - name: Restart Docker
       ansible.builtin.service:
         name: docker
