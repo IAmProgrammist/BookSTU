@@ -10,6 +10,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework import status
+from rest_framework.decorators import action
+from django.http import HttpResponse
+import csv
 
 
 class JournalModelViewSet(viewsets.ModelViewSet):
@@ -23,6 +26,33 @@ class JournalModelViewSet(viewsets.ModelViewSet):
     )
     permission_classes = (JournalPermission,)
     ordering_fields = ["begin_date"]
+
+    @action(detail=False, methods=['get'])
+    def export(self, request):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="journal.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow(['Дата начала', 'Дата возврата', 'Возвращено',
+                         'Инвентарный номер', 'Состояние книги', 'ISBN',
+                         'Имя книги', 'Фамилия читателя', 'Имя читателя',
+                         'Отчество читателя'])  # Replace with your model fields
+
+        # Фильтруем и упорядочиваем
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # Дополнительно фильтруем queryset так чтобы если у нас не было разрешения,
+        # то мы могли бы просматривать только свои записи в журнале
+        if not (request.user.is_superuser or request.user.has_perm("django_backend.view_journal")):
+            queryset = queryset.filter(user=request.user)
+
+        for journal in queryset.select_related("book").select_related("user"):
+            writer.writerow([journal.begin_date, journal.end_date, journal.returned_date,
+                             journal.book.inventory_number, journal.book.state, journal.book.description.isbn, 
+                             journal.book.description.name, journal.user.surname, journal.user.name, journal.user.patronymics])
+
+        return response
+
 
     def list(self, request, *args, **kwargs):
         # Филтруем и упорядочиваем

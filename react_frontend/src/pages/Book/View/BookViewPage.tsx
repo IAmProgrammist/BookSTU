@@ -13,6 +13,7 @@ import { useSearchParamsFilter } from "hooks/SearchParamsFilter";
 import { JournalListQuery } from "redux/types/journal";
 import dayjs from "dayjs";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { ENV_API_SERVER } from "envconsts";
 
 
 const PAGE_SIZE = 15;
@@ -133,6 +134,8 @@ export function BookViewPage() {
                             </FormControl>
                         </Box>
                         <Box sx={{ display: "flex", gap: 1 }}>
+                            <Button onClick={() => window.open(`${ENV_API_SERVER}/api/journals/export?book=${bookId}&${params?.ordering ? 'ordering=' + params?.ordering : ''}`, 
+                                '_blank')}>Экспортировать</Button>
                             {shouldShowCreateJournal ? <Button onClick={() => navigate(`/books/${bookId}/journals/create`)}>Создать</Button> : null}
                         </Box>
                     </Box>

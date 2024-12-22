@@ -12,6 +12,7 @@ import "dayjs/locale/ru";
 import dayjs from "dayjs";
 import { BOOK_STATE_NAMES } from "dicts";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { ENV_API_SERVER } from "envconsts";
 
 const PAGE_SIZE = 15;
 
@@ -139,6 +140,8 @@ export function UserViewPage() {
                                 </Select>
                             </FormControl>
                         </Box>
+                        <Button onClick={() => window.open(`${ENV_API_SERVER}/api/journals/export?user=${userId}&${params?.ordering ? 'ordering=' + params?.ordering : ''}`, 
+                                                        '_blank')}>Экспортировать</Button>
                     </Box>
                     {journalDataStatus.isError ? <Whoops /> :
                         journalDataStatus.isLoading ? <CircularProgress /> : <></>}
