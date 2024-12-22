@@ -45,19 +45,19 @@
         reauthorize: yes
     
     - name: Pull backend image
-      ansible.builtin.shell: docker pull ghcr.io/bookstu/backend:latest
+      ansible.builtin.shell: docker pull ghcr.io/iamprogrammist/bookstu/backend:latest
       become: yes
 
     - name: Pull frontend image
-      ansible.builtin.shell: docker pull ghcr.io/bookstu/frontend:latest
+      ansible.builtin.shell: docker pull ghcr.io/iamprogrammist/bookstu/frontend:latest
       become: yes
 
     - name: Pull nginx image
-      ansible.builtin.shell: docker pull ghcr.io/bookstu/nginx:latest
+      ansible.builtin.shell: docker pull ghcr.io/iamprogrammist/bookstu/nginx:latest
       become: yes
 
     - name: Pull database image
-      ansible.builtin.shell: docker pull ghcr.io/bookstu/database:latest
+      ansible.builtin.shell: docker pull ghcr.io/iamprogrammist/bookstu/database:latest
       become: yes
 
     - name: start app
