@@ -27,7 +27,7 @@ jobs:
         uses: int128/kaniko-action@v1
         with:
           push: true
-          tags: ghcr.io/${{ env.REPO_NAME }}/backend:latest
+          tags: ghcr.io/${{ env.REPO_NAME }}/backend
           cache: true
           cache-repository: ghcr.io/${{ env.REPO_NAME }}/backend/cache
           context: django_backend
@@ -36,7 +36,7 @@ jobs:
         uses: int128/kaniko-action@v1
         with:
           push: true
-          tags: ghcr.io/${{ env.REPO_NAME }}/frontend:latest
+          tags: ghcr.io/${{ env.REPO_NAME }}/frontend
           cache: true
           cache-repository: ghcr.io/${{ env.REPO_NAME }}/frontend/cache
           context: react_frontend
@@ -45,7 +45,7 @@ jobs:
         uses: int128/kaniko-action@v1
         with:
           push: true
-          tags: ghcr.io/${{ env.REPO_NAME }}/nginx:latest
+          tags: ghcr.io/${{ env.REPO_NAME }}/nginx
           cache: true
           cache-repository: ghcr.io/${{ env.REPO_NAME }}/nginx/cache
           context: nginx
