@@ -7,6 +7,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v3
 
@@ -62,5 +65,4 @@ jobs:
       - name: Run Ansible Script
         shell: bash
         run: |
-          cd ansible
-          ansible-playbook -i inventory.ini deploy-playbook.yml
+          ansible-playbook -i ansible/inventory.ini ansible/deploy-playbook.yaml
