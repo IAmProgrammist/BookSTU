@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   backend:
-    image: ghcr.io/BookSTU/backend:latest
+    image: ghcr.io/bookstu/backend:latest
     volumes:
       - django_static_volume:/usr/src/app/static
       - django_media_volume:/usr/src/app/media
@@ -24,7 +24,7 @@ services:
     ports:
       - 5432:5432
   frontend:
-    image: ghcr.io/BookSTU/frontend:latest
+    image: ghcr.io/bookstu/frontend:latest
     volumes:
       - react_static_volume:/usr/src/app/build/static
     hostname: frontend
@@ -38,7 +38,7 @@ services:
 
   nginx:
     restart: always
-    image: ghcr.io/BookSTU/nginx:latest
+    image: ghcr.io/bookstu/nginx:latest
     volumes:
       - django_static_volume:/usr/src/app/django_files/static
       - django_media_volume:/usr/src/app/media
