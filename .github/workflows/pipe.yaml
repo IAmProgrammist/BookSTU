@@ -7,6 +7,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    env:
+      LOWERCASE_REPO_NAME: ${{ github.repository | toJSON() | fromJson() | lower() }}
     steps:
       - uses: actions/checkout@v3
       - uses: docker/login-action@v1
@@ -14,41 +16,44 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: int128/kaniko-action@v1
+      - name: Build and Push Backend
+        uses: int128/kaniko-action@v1
         with:
           push: true
-          tags: ghcr.io/${{ github.repository | toLowerCase }}/backend:latest
+          tags: ghcr.io/${{ env.LOWERCASE_REPO_NAME }}/backend:latest
           cache: true
-          cache-repository: ghcr.io/${{ github.repository | toLowerCase }}/backend/cache
+          cache-repository: ghcr.io/${{ env.LOWERCASE_REPO_NAME }}/backend/cache
           context: django_backend
-      - uses: int128/kaniko-action@v1
+      - name: Build and Push Frontend
+        uses: int128/kaniko-action@v1
         with:
           push: true
-          tags: ghcr.io/${{ github.repository | toLowerCase }}/frontend:latest
+          tags: ghcr.io/${{ env.LOWERCASE_REPO_NAME }}/frontend:latest
           cache: true
-          cache-repository: ghcr.io/${{ github.repository | toLowerCase }}/frontend/cache
+          cache-repository: ghcr.io/${{ env.LOWERCASE_REPO_NAME }}/frontend/cache
           context: react_frontend
-      - uses: int128/kaniko-action@v1
+      - name: Build and Push Nginx
+        uses: int128/kaniko-action@v1
         with:
           push: true
-          tags: ghcr.io/${{ github.repository | toLowerCase }}/nginx:latest
+          tags: ghcr.io/${{ env.LOWERCASE_REPO_NAME }}/nginx:latest
           cache: true
-          cache-repository: ghcr.io/${{ github.repository | toLowerCase }}/nginx/cache
+          cache-repository: ghcr.io/${{ env.LOWERCASE_REPO_NAME }}/nginx/cache
           context: nginx
   deploy:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v3
-      - name: Setup SSH 
+      - name: Setup SSH
         shell: bash
         run: |
-         eval `ssh-agent -s`
-         mkdir -p ~/.ssh/
-         touch ~/.ssh/id_rsa
-         echo -e "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-         chmod 700 ~/.ssh/id_rsa
-      - name: Run ansible script
-        shell: bash 
+          eval `ssh-agent -s`
+          mkdir -p ~/.ssh/
+          touch ~/.ssh/id_rsa
+          echo -e "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 700 ~/.ssh/id_rsa
+      - name: Run Ansible Script
+        shell: bash
         run: |
           cd ansible
           ansible-playbook -i inventory.ini deploy-playbook.yml
