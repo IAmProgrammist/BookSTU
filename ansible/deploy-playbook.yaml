@@ -41,7 +41,7 @@
       docker_login:
         registry: ghcr.io
         username: Exophyray
-        password: "{{ lookup('env', GHCR_PAT) }}"
+        password: "{{ lookup('env', 'GHCR_PAT') }}"
         reauthorize: yes
     
     - name: Pull backend image
