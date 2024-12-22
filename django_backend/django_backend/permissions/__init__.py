@@ -4,3 +4,4 @@ from django_backend.permissions.publishing_house import PublishingHousePermissio
 from django_backend.permissions.book_description import BookDescriptionPermission
 from django_backend.permissions.book import BookPermission
 from django_backend.permissions.journal import JournalPermission
+from django_backend.permissions.user import ProfilePermission

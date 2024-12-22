@@ -2,7 +2,7 @@ from rest_framework.permissions import BasePermission
 
 class JournalPermission(BasePermission):
     def has_permission(self, request, view):
-        # Пропускаем GET, потому что будем проверять в 
+        # Пропускаем GET, потому что будем проверять в has_object_permission
         return (
             request.user.is_superuser or
             request.method == "GET" or

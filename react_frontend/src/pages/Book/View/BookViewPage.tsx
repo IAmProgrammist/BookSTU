@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDeleteBookMutation, useGetCSRFQuery, useGetBookQuery, useGetBookDescriptionQuery, useGetJournalListQuery } from "../../../redux/api/baseApi";
-import { Box, Button, Card, CardContent, CardHeader, CircularProgress, Container, FormControl, InputLabel, MenuItem, Select, Typography } from "@mui/material";
+import { Box, Button, Card, CardActionArea, CardContent, CardHeader, CircularProgress, Container, FormControl, InputLabel, MenuItem, Pagination, Select, Typography } from "@mui/material";
 import { Whoops } from "../../../components/Whoops";
 import { useShowError } from "hooks/ShowError";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,9 @@ import { usePermissions } from "hooks/usePermissions";
 import { BOOK_STATE_NAMES } from "dicts";
 import { useSearchParamsFilter } from "hooks/SearchParamsFilter";
 import { JournalListQuery } from "redux/types/journal";
+
+
+const PAGE_SIZE = 15;
 
 export function BookViewPage() {
     const { bookId } = useParams();
@@ -66,6 +69,10 @@ export function BookViewPage() {
         return permissionsIsSuccess && permissions.findIndex((item) => item === "django_backend.view_journal") !== -1;
     }, [permissions, permissionsIsSuccess]);
 
+    const shouldShowCreateJournal = useMemo(() => {
+        return permissionsIsSuccess && permissions.findIndex((item) => item === "django_backend.add_journal") !== -1;
+    }, [permissions, permissionsIsSuccess]);
+
     const { data: journalData, ...journalDataStatus } = useGetJournalListQuery({
         ordering: params?.ordering,
         page: params?.page,
@@ -115,18 +122,18 @@ export function BookViewPage() {
                         }}
                     >
                         <MenuItem value={null}>Без сортировки</MenuItem>
-                        <MenuItem value="inventory_number">По инв. номеру (A-Z)</MenuItem>
-                        <MenuItem value="-inventory_number">По инв. номеру (Z-A)</MenuItem>
+                        <MenuItem value="begin_date">Сначала старые записи</MenuItem>
+                        <MenuItem value="-begin_date">Сначала новые записи</MenuItem>
                     </Select>
                 </FormControl>
             </Box>
             <Box sx={{ display: "flex", gap: 1 }}>
-                {shouldShowCreate ? <Button onClick={() => navigate(`/book-descriptions/${bookDescriptionId}/books/create`)}>Создать</Button> : null}
+                {shouldShowCreateJournal ? <Button onClick={() => navigate(`/books/${bookId}/journals/create`)}>Создать</Button> : null}
             </Box>
         </Box>
-        {isError ? <Whoops /> :
-            isLoading ? <CircularProgress /> : <></>}
-        {isSuccess ? (data.results.length == 0 ? <Whoops title="Книг не найдено" description="Возможно, Вы даже пополните этот ещё пополняющийся список" /> :
+        {journalDataStatus.isError ? <Whoops /> :
+            journalDataStatus.isLoading ? <CircularProgress /> : <></>}
+        {journalDataStatus.isSuccess ? (journalData.results.length == 0 ? <Whoops title="Записей в журнале не найдено" description="Возможно, Вы даже пополните этот ещё пополняющийся список" /> :
             <Box sx={{
                 display: "grid",
                 gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr));",
@@ -134,16 +141,14 @@ export function BookViewPage() {
                 width: "100%",
                 my: 4
             }}>
-                {data.results.map((item) => <Card variant="outlined" key={item.id}>
-                    <CardActionArea onClick={() => navigate(`/books/${item.id}`)}>
-                        <CardHeader
-                            title={item.inventory_number}
-                            subheader={<>Состояние: {BOOK_STATE_NAMES[item.state]}</>} />
+                {journalData.results.map((item) => <Card variant="outlined" key={item.id}>
+                    <CardActionArea onClick={() => navigate(`/journals/${item.id}`)}>
+                        {item.id}
                     </CardActionArea>
                 </Card>)}
             </Box>) : null}
-        {data?.next || data?.previous ? <Pagination
-            count={Math.ceil(data?.count / PAGE_SIZE)}
+        {journalData?.next || journalData?.previous ? <Pagination
+            count={Math.ceil(journalData?.count / PAGE_SIZE)}
             page={params?.page}
             onChange={(_ev, page) => patchParams({ page })} /> : null}
     </Container>

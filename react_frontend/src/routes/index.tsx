@@ -1,28 +1,29 @@
 import { Navigate, Params, useRoutes } from "react-router-dom";
-import { LoginPage } from "../pages/Auth/Login";
-import { RegisterPage } from "../pages/Auth/Register/Register";
+import { LoginPage } from "pages/Auth/Login";
+import { RegisterPage } from "pages/Auth/Register/Register";
 import React from "react";
 import { RouteHeader } from "./RouteHeader";
-import { GenreListPage } from "../pages/Genre/List/GenreListPage";
-import { GenreViewPage } from "../pages/Genre/View/GenreViewPage";
-import { GenreUpdatePage } from "../pages/Genre/Update";
-import { GenreCreatePage } from "../pages/Genre/Create";
-import { PublishingHouseCreatePage } from "../pages/PublishingHouse/Create";
-import { PublishingHouseUpdatePage } from "../pages/PublishingHouse/Update";
-import { PublishingHouseViewPage } from "../pages/PublishingHouse/View";
-import { PublishingHouseListPage } from "../pages/PublishingHouse/List";
-import { AuthorCreatePage } from "../pages/Author/Create";
-import { AuthorListPage } from "../pages/Author/List";
-import { AuthorUpdatePage } from "../pages/Author/Update";
-import { AuthorViewPage } from "../pages/Author/View";
-import { BookDescriptionListPage } from "../pages/BookDescription/List";
-import { BookDescriptionCreatePage } from "../pages/BookDescription/Create";
-import { BookDescriptionViewPage } from "../pages/BookDescription/View";
-import { BookDescriptionUpdatePage } from "../pages/BookDescription/Update";
-import { BookListPage } from "../pages/Book/List";
-import { BookCreatePage } from "../pages/Book/Create";
-import { BookViewPage } from "../pages/Book/View";
+import { GenreListPage } from "pages/Genre/List/GenreListPage";
+import { GenreViewPage } from "pages/Genre/View/GenreViewPage";
+import { GenreUpdatePage } from "pages/Genre/Update";
+import { GenreCreatePage } from "pages/Genre/Create";
+import { PublishingHouseCreatePage } from "pages/PublishingHouse/Create";
+import { PublishingHouseUpdatePage } from "pages/PublishingHouse/Update";
+import { PublishingHouseViewPage } from "pages/PublishingHouse/View";
+import { PublishingHouseListPage } from "pages/PublishingHouse/List";
+import { AuthorCreatePage } from "pages/Author/Create";
+import { AuthorListPage } from "pages/Author/List";
+import { AuthorUpdatePage } from "pages/Author/Update";
+import { AuthorViewPage } from "pages/Author/View";
+import { BookDescriptionListPage } from "pages/BookDescription/List";
+import { BookDescriptionCreatePage } from "pages/BookDescription/Create";
+import { BookDescriptionViewPage } from "pages/BookDescription/View";
+import { BookDescriptionUpdatePage } from "pages/BookDescription/Update";
+import { BookListPage } from "pages/Book/List";
+import { BookCreatePage } from "pages/Book/Create";
+import { BookViewPage } from "pages/Book/View";
 import { BookUpdatePage } from "pages/Book/Update";
+import { JournalCreatePage } from "pages/Journal/Create";
 
 export const TITLE_MAP: { [key in string]: (params: Params<string>) => string } = {
     "/home": () => "Домашняя страница",
@@ -74,6 +75,9 @@ export function AppRoutes() {
 
                 { path: '/book-descriptions/:bookDescriptionId/books/create', element: <BookCreatePage /> },
                 { path: '/books/:bookId/update', element: <BookUpdatePage /> },
+
+                { path: '/books/:bookId/journals/create', element: <JournalCreatePage /> },
+
             ]
         },
         {

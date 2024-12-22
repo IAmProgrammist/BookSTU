@@ -7,6 +7,7 @@ from rest_framework.filters import OrderingFilter
 from django_backend.permissions import JournalPermission
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
 
 
 class JournalModelViewSet(viewsets.ModelViewSet):
@@ -19,6 +20,27 @@ class JournalModelViewSet(viewsets.ModelViewSet):
     )
     permission_classes = (JournalPermission,)
     ordering_fields = ["begin_date"]
+
+    def list(self, request, *args, **kwargs):
+        # Филтруем и упорядочиваем
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # Дополнительно фильтруем queryset так чтобы если у нас не было разрешения,
+        # то мы могли бы просматривать только свои записи в журнале
+        if request.method == "GET" and request.path == "/api/journals/" and not (
+            request.user.is_superuser or request.user.has_perm("django_backend.view_journal")
+        ):
+            queryset = queryset.filter(user=request.user)
+
+        # Продолжаем обычную логику запроса
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data)
 
     def perform_create(self, serializer):
         # Здесь проверим, что последняя запись либо отсутствует и не null
