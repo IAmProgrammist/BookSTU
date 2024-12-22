@@ -73,7 +73,7 @@ export function BookDescriptionUpdatePage() {
 
     const { data: dataAuthors, ...authorsStatus } = useGetAuthorListQuery({ id: data?.authors?.length ? data?.authors : [0], size: 50, short: true }, { skip: !isSuccess });
     const { data: dataGenres, ...genresStatus } = useGetGenreListQuery({ id: data?.genres?.length ? data?.genres : [0], size: 50, short: true }, { skip: !isSuccess });
-    const { data: publishingHouses, ...publishingHousesStatus } = useGetPublishingHouseQuery({ id: data?.publishing_house || 1, short: true }, { skip: !isSuccess });
+    const { data: publishingHouses, ...publishingHousesStatus } = useGetPublishingHouseQuery({ id: data?.publishing_house || 0, short: true }, { skip: !isSuccess });
 
     useEffect(() => {
         setValue("icon", data?.icon || "");

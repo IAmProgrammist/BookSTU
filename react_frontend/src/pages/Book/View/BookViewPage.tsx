@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDeleteBookMutation, useGetCSRFQuery, useGetBookQuery, useGetBookDescriptionQuery, useGetJournalListQuery } from "../../../redux/api/baseApi";
-import { Box, Button, Card, CardActionArea, CardContent, CardHeader, CircularProgress, Container, FormControl, InputLabel, MenuItem, Pagination, Select, Typography } from "@mui/material";
+import { Box, Button, Card, CardActionArea, CardContent, CardHeader, CircularProgress, Container, FormControl, InputLabel, MenuItem, Pagination, Select, Stack, Typography } from "@mui/material";
 import { Whoops } from "../../../components/Whoops";
 import { useShowError } from "hooks/ShowError";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ import { usePermissions } from "hooks/usePermissions";
 import { BOOK_STATE_NAMES } from "dicts";
 import { useSearchParamsFilter } from "hooks/SearchParamsFilter";
 import { JournalListQuery } from "redux/types/journal";
+import dayjs from "dayjs";
 
 
 const PAGE_SIZE = 15;
@@ -66,7 +67,7 @@ export function BookViewPage() {
     }, [permissions, permissionsIsSuccess]);
 
     const shouldShowJournal = useMemo(() => {
-        return permissionsIsSuccess && permissions.findIndex((item) => item === "django_backend.view_journal") !== -1;
+        return permissionsIsSuccess;
     }, [permissions, permissionsIsSuccess]);
 
     const shouldShowCreateJournal = useMemo(() => {
@@ -77,7 +78,7 @@ export function BookViewPage() {
         ordering: params?.ordering,
         page: params?.page,
         size: 15,
-        book: bookId
+        book: bookId,
     }, { skip: !shouldShowJournal })
 
     return <Container sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", gap: 3 }}>
@@ -107,51 +108,57 @@ export function BookViewPage() {
             </Card></> : null}
         {shouldShowJournal && journalDataStatus.isSuccess ?
             <><Typography variant="h4" sx={{ alignSelf: "start" }}>Журнал передачи:</Typography>
-            <Container sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", gap: 3 }}>
-        <Box sx={{ width: "100%", display: "flex" }}>
-            <Box sx={{ flexGrow: 1, display: "flex", gap: 1, flexWrap: "wrap" }}>
-                <FormControl sx={{ minWidth: 200 }}>
-                    <InputLabel id="ordering">Сортировка</InputLabel>
-                    <Select
-                        labelId="ordering"
-                        id="ordering"
-                        value={params?.ordering ?? null}
-                        label="Сортировка"
-                        onChange={(event) => {
-                            patchParams({ ordering: event.target.value });
-                        }}
-                    >
-                        <MenuItem value={null}>Без сортировки</MenuItem>
-                        <MenuItem value="begin_date">Сначала старые записи</MenuItem>
-                        <MenuItem value="-begin_date">Сначала новые записи</MenuItem>
-                    </Select>
-                </FormControl>
-            </Box>
-            <Box sx={{ display: "flex", gap: 1 }}>
-                {shouldShowCreateJournal ? <Button onClick={() => navigate(`/books/${bookId}/journals/create`)}>Создать</Button> : null}
-            </Box>
-        </Box>
-        {journalDataStatus.isError ? <Whoops /> :
-            journalDataStatus.isLoading ? <CircularProgress /> : <></>}
-        {journalDataStatus.isSuccess ? (journalData.results.length == 0 ? <Whoops title="Записей в журнале не найдено" description="Возможно, Вы даже пополните этот ещё пополняющийся список" /> :
-            <Box sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr));",
-                gap: 2,
-                width: "100%",
-                my: 4
-            }}>
-                {journalData.results.map((item) => <Card variant="outlined" key={item.id}>
-                    <CardActionArea onClick={() => navigate(`/journals/${item.id}`)}>
-                        {item.id}
-                    </CardActionArea>
-                </Card>)}
-            </Box>) : null}
-        {journalData?.next || journalData?.previous ? <Pagination
-            count={Math.ceil(journalData?.count / PAGE_SIZE)}
-            page={params?.page}
-            onChange={(_ev, page) => patchParams({ page })} /> : null}
-    </Container>
+                <Container sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", gap: 3 }}>
+                    <Box sx={{ width: "100%", display: "flex" }}>
+                        <Box sx={{ flexGrow: 1, display: "flex", gap: 1, flexWrap: "wrap" }}>
+                            <FormControl sx={{ minWidth: 200 }}>
+                                <InputLabel id="ordering">Сортировка</InputLabel>
+                                <Select
+                                    labelId="ordering"
+                                    id="ordering"
+                                    value={params?.ordering ?? null}
+                                    label="Сортировка"
+                                    onChange={(event) => {
+                                        patchParams({ ordering: event.target.value });
+                                    }}
+                                >
+                                    <MenuItem value={null}>Без сортировки</MenuItem>
+                                    <MenuItem value="begin_date">Сначала старые записи</MenuItem>
+                                    <MenuItem value="-begin_date">Сначала новые записи</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Box>
+                        <Box sx={{ display: "flex", gap: 1 }}>
+                            {shouldShowCreateJournal ? <Button onClick={() => navigate(`/books/${bookId}/journals/create`)}>Создать</Button> : null}
+                        </Box>
+                    </Box>
+                    {journalDataStatus.isError ? <Whoops /> :
+                        journalDataStatus.isLoading ? <CircularProgress /> : <></>}
+                    {journalDataStatus.isSuccess ? (journalData.results.length == 0 ? <Whoops title="Записей в журнале не найдено" description="Возможно, Вы даже пополните этот ещё пополняющийся список" /> :
+                        <Box sx={{
+                            display: "grid",
+                            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr));",
+                            gap: 2,
+                            width: "100%",
+                            my: 4
+                        }}>
+                            {journalData.results.map((item) => <Card variant="outlined" key={item.id}>
+                                <CardActionArea onClick={() => navigate(`/journals/${item.id}`)}>
+                                    <CardContent>
+                                        <Stack spacing={3}>
+                                            <Typography variant="body1">Выдано: {dayjs(item.begin_date).format("DD.MM.YYYY hh:mm")}</Typography>
+                                            <Typography variant="body1">Ожидается до: {dayjs(item.end_date).format("DD.MM.YYYY hh:mm")}</Typography>
+                                            <Typography variant="body1">{item.returned_date ? `Вовзращена ${dayjs(item.returned_date).format("DD.MM.YYYY hh:mm")}` : "Пока ещё читается"}</Typography>
+                                        </Stack>
+                                    </CardContent>
+                                </CardActionArea>
+                            </Card>)}
+                        </Box>) : null}
+                    {journalData?.next || journalData?.previous ? <Pagination
+                        count={Math.ceil(journalData?.count / PAGE_SIZE)}
+                        page={params?.page}
+                        onChange={(_ev, page) => patchParams({ page })} /> : null}
+                </Container>
             </> : null}
         <ConfirmationDialog
             id="book-delete"

@@ -11,4 +11,5 @@ class JournalSerializer(serializers.ModelSerializer):
             'begin_date',
             'end_date',
             'user',
+            'returned_date',
             )

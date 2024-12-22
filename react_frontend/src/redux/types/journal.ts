@@ -1,7 +1,7 @@
 import { PageableListQuery, PageableListResponse, SearcheableListQuery, SortableListQuery } from "./base"
 import { Book } from "./book"
 import { CSRFMiddlewareTokenQueryFormMixin } from "./csrf"
-import { User } from "./user"
+import { UserMe } from "./user"
 
 // Базовые модели
 export interface Journal {
@@ -10,7 +10,7 @@ export interface Journal {
     begin_date: string
     end_date: string
     returned_date?: string
-    user: User["user_id"]
+    user: UserMe["user_id"]
 }
 
 // Запросы

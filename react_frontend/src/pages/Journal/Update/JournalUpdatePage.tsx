@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useCreateJournalMutation, useGetBookDescriptionQuery, useGetBookQuery, useGetCSRFQuery, useGetUserListQuery } from "../../../redux/api/baseApi";
+import { useCreateJournalMutation, useGetBookDescriptionQuery, useGetBookQuery, useGetCSRFQuery, useGetJournalQuery, useGetUserListQuery, useUpdateJournalMutation } from "../../../redux/api/baseApi";
 import { Autocomplete, Button, Card, CardActions, CardContent, CardHeader, CircularProgress, Container, FormControl, FormHelperText, InputLabel, MenuItem, Select, Stack, TextField } from "@mui/material";
 import { useShowError } from "hooks/ShowError";
 import { useNavigate, useParams } from "react-router-dom";
@@ -15,15 +15,27 @@ import { useDebounce } from "hooks/useDebounce";
 import 'dayjs/locale/ru'
 import dayjs from "dayjs";
 
-export function JournalCreatePage() {
-    const { bookId } = useParams();
+export function JournalUpdatePage() {
+    const { journalId } = useParams();
     const { data: csrfData } = useGetCSRFQuery({});
-    const [createJournal, createJournalStatus] = useCreateJournalMutation();
+    const [updateJournal, updateJournalStatus] = useUpdateJournalMutation();
+
+    const {
+        data: journalData,
+        ...journalStatus
+    } = useGetJournalQuery({
+        id: journalId
+    });
+
+    useShowError({
+        isError: journalStatus.isError,
+        error: journalStatus.error
+    })
 
     const {
         data: bookData,
         ...bookStatus
-    } = useGetBookQuery({ id: bookId });
+    } = useGetBookQuery({ id: journalData?.book }, { skip: !journalData?.book });
 
     useShowError({
         isError: bookStatus.isError,
@@ -47,15 +59,17 @@ export function JournalCreatePage() {
         handleSubmit,
         formState: { errors },
         control,
+        setValue
     } = methods;
 
     const { enqueueSnackbar } = useSnackbar();
 
     const onSave = (data) => {
-        createJournal({
+        updateJournal({
             ...data,
-            book: bookId,
-            user: data?.user?.[0]?.id || "",
+            id: journalId,
+            user: usersSelected?.[0]?.id,
+            book: journalData?.book,
             csrfmiddlewaretoken: csrfData?.csrf,
             begin_date: dayjs(data?.begin_date).isValid() ?
                 dayjs(data?.begin_date).format("YYYY-MM-DDTHH:mm:ssZ") : "",
@@ -67,18 +81,18 @@ export function JournalCreatePage() {
     }
 
     useEffect(() => {
-        if (!createJournalStatus.isSuccess) return;
+        if (!updateJournalStatus.isSuccess) return;
         enqueueSnackbar({
-            message: "Запись успешно добавлена",
+            message: "Запись успешно обновлена",
             variant: "success",
         })
-        navigate(`/journals/${createJournalStatus.data.id}`)
+        navigate(`/journals/${journalId}`)
 
-    }, [createJournalStatus]);
+    }, [updateJournalStatus]);
 
     useShowError({
-        isError: createJournalStatus.isError,
-        error: createJournalStatus.error,
+        isError: updateJournalStatus.isError,
+        error: updateJournalStatus.error,
         formMethods: methods
     });
 
@@ -86,7 +100,7 @@ export function JournalCreatePage() {
 
     useEffect(() => {
         if (permissionsIsSuccess) {
-            if (permissions.findIndex((item) => item === "django_backend.add_journal") === -1) {
+            if (permissions.findIndex((item) => item === "django_backend.change_journal") === -1) {
                 enqueueSnackbar({
                     message: "Недостаточно прав",
                     variant: "error",
@@ -109,6 +123,20 @@ export function JournalCreatePage() {
         !usersSelected.some((item1) => item1.id === item.id)
     ));
 
+    const { data: profiles, ...profilesStatus } = useGetUserListQuery({ id: [journalData?.user || 0], size: 1 }, { skip: !journalStatus.isSuccess });
+
+    useEffect(() => {
+        if (!journalStatus.isSuccess) return;
+        setValue("begin_date", dayjs(journalData.begin_date));
+        setValue("end_date", dayjs(journalData.end_date));
+        setValue("returned_date", journalData.returned_date ? dayjs(journalData.returned_date) : null);
+    }, [journalStatus]);
+
+    useEffect(() => {
+        if (!profilesStatus.isSuccess) return;
+        setUsersSelected(profiles?.results || []);
+    }, [profilesStatus])
+
     return <Container sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", gap: 3 }}>
         <Card sx={{ width: "100%" }}>
             <CardContent>
@@ -125,14 +153,13 @@ export function JournalCreatePage() {
                             <Controller
                                 name="begin_date"
                                 control={control}
-                                rules={{required: "Дата выдачи обязательна"}}
                                 defaultValue={null}
                                 render={({ field: { value, onChange, ref } }) => (
                                     <FormControl>
                                         <DesktopDateTimePicker
                                             label="Дата выдачи"
                                             ref={ref}
-                                            disabled={createJournalStatus.isLoading || bookDescriptionStatus.isLoading || bookStatus.isLoading}
+                                            disabled={journalStatus.isLoading || updateJournalStatus.isLoading || bookDescriptionStatus.isLoading || bookStatus.isLoading}
                                             sx={{ width: "100%" }}
                                             value={value}
                                             onChange={(newValue) => onChange(newValue)}
@@ -143,7 +170,6 @@ export function JournalCreatePage() {
                             />
                             <Controller
                                 name="end_date"
-                                rules={{required: "Дата возврата обязательна"}}
                                 control={control}
                                 defaultValue={null}
                                 render={({ field: { value, onChange, ref } }) => (
@@ -151,7 +177,7 @@ export function JournalCreatePage() {
                                         <DesktopDateTimePicker
                                             label="Ожидаемая дата возврата"
                                             ref={ref}
-                                            disabled={createJournalStatus.isLoading || bookDescriptionStatus.isLoading || bookStatus.isLoading}
+                                            disabled={journalStatus.isLoading || updateJournalStatus.isLoading || bookDescriptionStatus.isLoading || bookStatus.isLoading}
                                             sx={{ width: "100%" }}
                                             value={value}
                                             onChange={(newValue) => onChange(newValue)}
@@ -169,7 +195,7 @@ export function JournalCreatePage() {
                                         <DesktopDateTimePicker
                                             label="Возвращена пользователем"
                                             ref={ref}
-                                            disabled={createJournalStatus.isLoading || bookDescriptionStatus.isLoading || bookStatus.isLoading}
+                                            disabled={journalStatus.isLoading || updateJournalStatus.isLoading || bookDescriptionStatus.isLoading || bookStatus.isLoading}
                                             sx={{ width: "100%" }}
                                             value={value}
                                             onChange={(newValue) => onChange(newValue)}
@@ -191,7 +217,7 @@ export function JournalCreatePage() {
                                     isOptionEqualToValue={(option, value) => option.id === value.id}
                                     getOptionLabel={(option) => `${option.surname} ${option.name} ${option.patronymics}`}
                                     options={mergedUsersOptions}
-                                    loading={usersIsLoading}
+                                    loading={usersIsLoading || journalStatus.isLoading || updateJournalStatus.isLoading || bookDescriptionStatus.isLoading || bookStatus.isLoading}
                                     value={usersSelected}
                                     loadingText="Загрузка..."
                                     noOptionsText="Не найдено"
@@ -206,8 +232,8 @@ export function JournalCreatePage() {
                                         <TextField
                                             {...params}
                                             label="Пользователь"
-                                            helperText={`${errors?.user?.message ?? ""}`}
-                                            error={!!errors?.user}
+                                            helperText={`${errors?.publishing_house?.message ?? ""}`}
+                                            error={!!errors?.publishing_house}
                                             slotProps={{
                                                 input: {
                                                     ...params.InputProps,
@@ -226,8 +252,8 @@ export function JournalCreatePage() {
                 </FormProvider>
             </CardContent>
             <CardActions>
-                <Button disabled={createJournalStatus.isLoading || bookDescriptionStatus.isLoading || bookStatus.isLoading} onClick={() => handleSubmit(onSave)()}>Сохранить</Button>
-                <Button disabled={createJournalStatus.isLoading || bookDescriptionStatus.isLoading || bookStatus.isLoading} onClick={() => navigate(-1)}>Отмена</Button>
+                <Button disabled={journalStatus.isLoading || updateJournalStatus.isLoading || bookDescriptionStatus.isLoading || bookStatus.isLoading} onClick={() => handleSubmit(onSave)()}>Обновить</Button>
+                <Button disabled={journalStatus.isLoading || updateJournalStatus.isLoading || bookDescriptionStatus.isLoading || bookStatus.isLoading} onClick={() => navigate(-1)}>Отмена</Button>
             </CardActions>
         </Card>
     </Container>
