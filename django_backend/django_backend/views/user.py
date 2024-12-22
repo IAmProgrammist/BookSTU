@@ -126,7 +126,7 @@ class ProfileModelViewSet(mixins.RetrieveModelMixin,
             'passport_data': this_profile.passport_data,
             'phone_number': this_profile.phone_number,
             'banned': this_profile.banned,
-            'user_id': request.user.id,
+            'user_id': this_profile.id,
             'email': request.user.username,
             'permissions': [str(permission) for permission in permissions]
         }, status=200)
