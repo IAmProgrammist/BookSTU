@@ -70,5 +70,6 @@ jobs:
         shell: bash
         env:
           GHCR_PAT: ${{ secrets.GHCR_PAT }}
+          GITHUB_ACTOR: ${{ github.actor }}
         run: |
           ansible-playbook -i ansible/inventory.ini ansible/deploy-playbook.yaml

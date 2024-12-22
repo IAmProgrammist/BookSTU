@@ -37,11 +37,8 @@
     - debug:
         var: compose_file_status.stat.exists
     - name: Log in to GitHub Container Registry
-      environment:
-        ghcr_pat: "{{ lookup('env', 'GHCR_PAT') }}"
-        github_actor: "{{ lookup('env', 'GITHUB_ACTOR') }}"
       ansible.builtin.shell: |
-        echo "{{ ghcr_pat }}" | docker login ghcr.io -u {{ github_actor }} --password-stdin
+        echo "{{ lookup('env', 'GHCR_PAT') }}" | docker login ghcr.io -u {{ lookup('env', 'GITHUB_ACTOR') }} --password-stdin
       become: yes
     - name: start app
       community.docker.docker_compose_v2:
