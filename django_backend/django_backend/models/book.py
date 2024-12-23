@@ -14,7 +14,7 @@ class Book(models.Model):
         LOST = "5", "Утеряна"
 
     id = models.AutoField(primary_key=True)
-    inventory_number = models.CharField(unique=True, blank=False, null=False)
+    inventory_number = models.CharField(unique=True, blank=False, null=False, db_index=True)
     description = models.ForeignKey(
         BookDescription,
         null=False,
@@ -24,5 +24,6 @@ class Book(models.Model):
     state = models.CharField(
         max_length=1,
         choices=BookState.choices,
-        default=BookState.GOOD
+        default=BookState.GOOD, 
+        db_index=True
     )

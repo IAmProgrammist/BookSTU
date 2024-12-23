@@ -12,7 +12,7 @@ class BookDescription(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.TextField(blank=False, null=False, max_length=40, default="Дефолтное имя")
     isbn = models.TextField(blank=False, null=False,
-                            validators=[validate_isbn])
+                            validators=[validate_isbn], db_index=True)
     description = models.TextField(blank=False, null=False, max_length=2048)
     genres = models.ManyToManyField(Genre)
     publishing_house = models.ForeignKey(PublishingHouse, null=False, on_delete=models.PROTECT)

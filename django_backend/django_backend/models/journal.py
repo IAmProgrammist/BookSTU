@@ -8,9 +8,9 @@ class Journal(models.Model):
     book = models.ForeignKey(
         Book, null=False, on_delete=models.PROTECT
     )
-    begin_date = models.DateTimeField(null=False)
-    end_date = models.DateTimeField(null=False)
-    returned_date = models.DateTimeField(null=True)
+    begin_date = models.DateTimeField(null=False, db_index=True)
+    end_date = models.DateTimeField(null=False, db_index=True)
+    returned_date = models.DateTimeField(null=True, db_index=True)
     user = models.ForeignKey(
         Profile, null=False, on_delete=models.CASCADE
     )

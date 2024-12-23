@@ -72,6 +72,7 @@ export function RegisterPage() {
             <Controller
                 name="surname"
                 control={control}
+                defaultValue=""
                 rules={{
                     required: "Фамилия обязательна",
                     maxLength: {
@@ -98,6 +99,7 @@ export function RegisterPage() {
             <Controller
                 name="name"
                 control={control}
+                defaultValue=""
                 rules={{
                     required: "Имя обязательно",
                     maxLength: {
@@ -124,6 +126,7 @@ export function RegisterPage() {
             <Controller
                 name="patronymics"
                 control={control}
+                defaultValue=""
                 rules={{
                     maxLength: {
                         value: 50,
@@ -148,6 +151,7 @@ export function RegisterPage() {
                 )} />
             <Controller
                 name="passport_data"
+                defaultValue=""
                 control={control}
                 rules={{
                     required: "Паспортные данные обязательны",
@@ -170,6 +174,7 @@ export function RegisterPage() {
                 )} />
             <Controller
                 name="phone_number"
+                defaultValue=""
                 control={control}
                 rules={{
                     required: "Номер телефона обязателен",
@@ -197,6 +202,7 @@ export function RegisterPage() {
                 )} />
             <Controller
                 name="email"
+                defaultValue=""
                 control={control}
                 rules={{
                     required: "Почта обязательна",
@@ -219,6 +225,7 @@ export function RegisterPage() {
                 )} />
             <Controller
                 name="password1"
+                defaultValue=""
                 control={control}
                 rules={{
                     pattern: {
@@ -240,6 +247,7 @@ export function RegisterPage() {
                 )} />
             <Controller
                 name="password2"
+                defaultValue=""
                 control={control}
                 rules={{
                     validate: () => {
