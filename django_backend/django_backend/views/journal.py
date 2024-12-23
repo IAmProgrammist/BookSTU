@@ -13,6 +13,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from django.http import HttpResponse
 import csv
+import json
 
 
 class JournalModelViewSet(viewsets.ModelViewSet):
@@ -28,7 +29,7 @@ class JournalModelViewSet(viewsets.ModelViewSet):
     ordering_fields = ["begin_date"]
 
     @action(detail=False, methods=['get'])
-    def export(self, request):
+    def csvexport(self, request):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="journal.csv"'
 
@@ -50,6 +51,39 @@ class JournalModelViewSet(viewsets.ModelViewSet):
             writer.writerow([journal.begin_date, journal.end_date, journal.returned_date,
                              journal.book.inventory_number, journal.book.state, journal.book.description.isbn, 
                              journal.book.description.name, journal.user.surname, journal.user.name, journal.user.patronymics])
+
+        return response
+
+    @action(detail=False, methods=['get'])
+    def jsonexport(self, request):
+        response = HttpResponse(content_type='application/json')
+        response['Content-Disposition'] = 'attachment; filename="journal.json"'
+
+        results = []
+
+        # Фильтруем и упорядочиваем
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # Дополнительно фильтруем queryset так чтобы если у нас не было разрешения,
+        # то мы могли бы просматривать только свои записи в журнале
+        if not (request.user.is_superuser or request.user.has_perm("django_backend.view_journal")):
+            queryset = queryset.filter(user__user=request.user)
+
+        for journal in queryset.select_related("book").select_related("user"):
+            results.append({
+                'Дата начала': journal.begin_date,
+                'Дата возврата': journal.end_date,
+                'Возвращено': journal.returned_date,
+                'Инвентарный номер': journal.book.inventory_number,
+                'Состояние книги': journal.book.state,
+                'ISBN': journal.book.description.isbn,
+                'Имя книги': journal.book.description.name,
+                'Фамилия читателя': journal.user.surname,
+                'Имя читателя': journal.user.name,
+                'Отчество читателя': journal.user.patronymics
+            })
+
+        response.write(json.dumps(results, default=str))
 
         return response
 

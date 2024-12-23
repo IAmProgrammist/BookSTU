@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useGetBookDescriptionListQuery, useGetBookListQuery, useGetJournalListQuery, useGetUserMeQuery, useGetUserQuery, usePatchUserMutation } from "../../../redux/api/baseApi";
-import { Box, Button, Card, CardActionArea, CardContent, CardHeader, CircularProgress, Container, FormControl, InputLabel, MenuItem, Pagination, Select, Stack, Typography } from "@mui/material";
+import { Box, Button, ButtonGroup, Card, CardActionArea, CardContent, CardHeader, CircularProgress, ClickAwayListener, Container, FormControl, Grow, InputLabel, MenuItem, MenuList, Pagination, Paper, Popper, Select, Stack, Typography } from "@mui/material";
 import { Whoops } from "../../../components/Whoops";
 import { useShowError } from "hooks/ShowError";
 import { useNavigate } from "react-router-dom";
@@ -11,8 +11,8 @@ import { Journal, JournalListQuery } from "redux/types/journal";
 import "dayjs/locale/ru";
 import dayjs from "dayjs";
 import { BOOK_STATE_NAMES } from "dicts";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { ENV_API_SERVER } from "envconsts";
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 const PAGE_SIZE = 15;
 
@@ -88,12 +88,30 @@ export function UserViewPage() {
 
     const [patchUser, patchUserStatus] = usePatchUserMutation();
 
+    const [openExport, setOpenExport] = React.useState(false);
+    const anchorRefExport = React.useRef<HTMLDivElement>(null);
+
+    const handleToggleExport = () => {
+        setOpenExport((prevOpen) => !prevOpen);
+    };
+
+    const handleCloseExport = (event: Event) => {
+        if (
+            anchorRefExport.current &&
+            anchorRefExport.current.contains(event.target as HTMLElement)
+        ) {
+            return;
+        }
+
+        setOpenExport(false);
+    };
+
     return <Container sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", gap: 3 }}>
         <Box sx={{ width: "100%", display: "flex" }}>
             <Box sx={{ flexGrow: 1, display: "flex", gap: 1 }}>
             </Box>
             <Box sx={{ display: "flex", gap: 1 }}>
-                {shouldShowUpdate && <Button onClick={() => patchUser({id: userId, banned: !data?.banned})}>{data?.banned ? "Разбанить" : "Забанить"}</Button>}
+                {shouldShowUpdate && <Button onClick={() => patchUser({ id: userId, banned: !data?.banned })}>{data?.banned ? "Разбанить" : "Забанить"}</Button>}
             </Box>
         </Box>
         {isError ? <Whoops /> :
@@ -140,8 +158,60 @@ export function UserViewPage() {
                                 </Select>
                             </FormControl>
                         </Box>
-                        <Button onClick={() => window.open(`${ENV_API_SERVER}/api/journals/export?user=${userId}&${params?.ordering ? 'ordering=' + params?.ordering : ''}`, 
-                                                        '_blank')}>Экспортировать</Button>
+                        <ButtonGroup
+                            ref={anchorRefExport}
+                            aria-label="Экспортировать"
+                            variant="text"
+                        >
+                            <Button onClick={handleToggleExport}>Экспортировать</Button>
+                            <Button
+                                size="small"
+                                aria-controls={openExport ? 'split-button-menu' : undefined}
+                                aria-expanded={openExport ? 'true' : undefined}
+                                aria-label="Выбрать вид экспорта"
+                                aria-haspopup="menu"
+                                onClick={handleToggleExport}
+                            >
+                                <ArrowDropDownIcon />
+                            </Button>
+                        </ButtonGroup>
+                        <Popper
+                            sx={{ zIndex: 1 }}
+                            open={openExport}
+                            anchorEl={anchorRefExport.current}
+                            role={undefined}
+                            transition
+                            disablePortal
+                        >
+                            {({ TransitionProps, placement }) => (
+                                <Grow
+                                    {...TransitionProps}
+                                    style={{
+                                        transformOrigin:
+                                            placement === 'bottom' ? 'center top' : 'center bottom',
+                                    }}
+                                >
+                                    <Paper>
+                                        <ClickAwayListener onClickAway={handleCloseExport}>
+                                            <MenuList id="split-button-menu" autoFocusItem>
+                                                <MenuItem
+                                                    onClick={() => window.open(`${ENV_API_SERVER}/api/journals/csvexport?user=${userId}&${params?.ordering ? 'ordering=' + params?.ordering : ''}`,
+                                                        '_blank')}
+                                                >
+                                                    Экспорт в .csv
+                                                </MenuItem>
+                                                <MenuItem
+                                                    onClick={() => window.open(`${ENV_API_SERVER}/api/journals/jsonexport?user=${userId}&${params?.ordering ? 'ordering=' + params?.ordering : ''}`,
+                                                        '_blank')}
+                                                >
+                                                    Экспорт в .json
+                                                </MenuItem>
+                                            </MenuList>
+                                        </ClickAwayListener>
+                                    </Paper>
+                                </Grow>
+                            )}
+                        </Popper>
                     </Box>
                     {journalDataStatus.isError ? <Whoops /> :
                         journalDataStatus.isLoading ? <CircularProgress /> : <></>}
