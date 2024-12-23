@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDeleteBookMutation, useGetCSRFQuery, useGetBookQuery, useGetBookDescriptionQuery, useGetJournalListQuery } from "../../../redux/api/baseApi";
-import { Box, Button, Card, CardActionArea, CardContent, CardHeader, CircularProgress, Container, FormControl, InputLabel, MenuItem, Pagination, Select, Stack, Typography } from "@mui/material";
+import { Box, Button, ButtonGroup, Card, CardActionArea, CardContent, CardHeader, CircularProgress, ClickAwayListener, Container, FormControl, Grow, InputLabel, MenuItem, MenuList, Pagination, Paper, Popper, Select, Stack, Typography } from "@mui/material";
 import { Whoops } from "../../../components/Whoops";
 import { useShowError } from "hooks/ShowError";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +14,7 @@ import { JournalListQuery } from "redux/types/journal";
 import dayjs from "dayjs";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { ENV_API_SERVER } from "envconsts";
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 
 const PAGE_SIZE = 15;
@@ -81,7 +82,25 @@ export function BookViewPage() {
         page: params?.page,
         size: PAGE_SIZE,
         book: bookId,
-    }, { skip: !shouldShowJournal })
+    }, { skip: !shouldShowJournal });
+
+    const [openExport, setOpenExport] = React.useState(false);
+    const anchorRefExport = React.useRef<HTMLDivElement>(null);
+
+    const handleToggleExport = () => {
+        setOpenExport((prevOpen) => !prevOpen);
+    };
+
+    const handleCloseExport = (event: Event) => {
+        if (
+            anchorRefExport.current &&
+            anchorRefExport.current.contains(event.target as HTMLElement)
+        ) {
+            return;
+        }
+
+        setOpenExport(false);
+    };
 
     return <Container sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", gap: 3 }}>
         <Box sx={{ width: "100%", display: "flex" }}>
@@ -134,8 +153,60 @@ export function BookViewPage() {
                             </FormControl>
                         </Box>
                         <Box sx={{ display: "flex", gap: 1 }}>
-                            <Button onClick={() => window.open(`${ENV_API_SERVER}/api/journals/export?book=${bookId}&${params?.ordering ? 'ordering=' + params?.ordering : ''}`, 
-                                '_blank')}>Экспортировать</Button>
+                            <ButtonGroup
+                                ref={anchorRefExport}
+                                aria-label="Экспортировать"
+                                variant="text"
+                            >
+                                <Button onClick={handleToggleExport}>Экспортировать</Button>
+                                <Button
+                                    size="small"
+                                    aria-controls={openExport ? 'split-button-menu' : undefined}
+                                    aria-expanded={openExport ? 'true' : undefined}
+                                    aria-label="Выбрать вид экспорта"
+                                    aria-haspopup="menu"
+                                    onClick={handleToggleExport}
+                                >
+                                    <ArrowDropDownIcon />
+                                </Button>
+                            </ButtonGroup>
+                            <Popper
+                                sx={{ zIndex: 1 }}
+                                open={openExport}
+                                anchorEl={anchorRefExport.current}
+                                role={undefined}
+                                transition
+                                disablePortal
+                            >
+                                {({ TransitionProps, placement }) => (
+                                    <Grow
+                                        {...TransitionProps}
+                                        style={{
+                                            transformOrigin:
+                                                placement === 'bottom' ? 'center top' : 'center bottom',
+                                        }}
+                                    >
+                                        <Paper>
+                                            <ClickAwayListener onClickAway={handleCloseExport}>
+                                                <MenuList id="split-button-menu" autoFocusItem>
+                                                    <MenuItem
+                                                        onClick={() => window.open(`${ENV_API_SERVER}/api/journals/csvexport?book=${bookId}&${params?.ordering ? 'ordering=' + params?.ordering : ''}`,
+                                                            '_blank')}
+                                                    >
+                                                        Экспорт в .csv
+                                                    </MenuItem>
+                                                    <MenuItem
+                                                        onClick={() => window.open(`${ENV_API_SERVER}/api/journals/jsonexport?book=${bookId}&${params?.ordering ? 'ordering=' + params?.ordering : ''}`,
+                                                            '_blank')}
+                                                    >
+                                                        Экспорт в .json
+                                                    </MenuItem>
+                                                </MenuList>
+                                            </ClickAwayListener>
+                                        </Paper>
+                                    </Grow>
+                                )}
+                            </Popper>
                             {shouldShowCreateJournal ? <Button onClick={() => navigate(`/books/${bookId}/journals/create`)}>Создать</Button> : null}
                         </Box>
                     </Box>
