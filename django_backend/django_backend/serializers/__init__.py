@@ -14,3 +14,6 @@ from django_backend.serializers.book_description import (
     BookDescriptionSerializer,
     BookDescriptionShortSerializer
 )
+from django_backend.serializers.book import BookSerializer
+from django_backend.serializers.journal import JournalSerializer
+from django_backend.serializers.user import ProfileSerializer

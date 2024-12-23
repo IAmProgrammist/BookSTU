@@ -1,10 +1,12 @@
+import { PageableListQuery, PageableListResponse, SearcheableListQuery, SortableListQuery } from "./base"
 import { CSRFMiddlewareTokenQueryFormMixin } from "./csrf"
 
-export interface User {
+// Базовые модели
+export interface UserMe {
     is_authenticated: boolean
     banned?: boolean
     user_id?: number
-    name: string
+    username: string
     surname: string
     patronymics: string
     email: string
@@ -13,7 +15,22 @@ export interface User {
     permissions?: string[]
 }
 
-export interface UserSignupQuery extends CSRFMiddlewareTokenQueryFormMixin, Exclude<User, "is_authenticated" | "banned" | "user_id"> {
+export interface User {
+    id: number | string
+    user: {
+        id: User["id"]
+        username: string
+    }
+    phone_number: string
+    surname: string
+    name: string
+    patronymics?: string
+    passport_data: string
+    banned: boolean
+}
+
+// Запросы
+export interface UserSignupQuery extends CSRFMiddlewareTokenQueryFormMixin, Exclude<UserMe, "is_authenticated" | "banned" | "user_id"> {
     password1: string
     password2: string
 }
@@ -23,13 +40,35 @@ export interface UserLoginQuery extends CSRFMiddlewareTokenQueryFormMixin {
     password: string
 }
 
-export interface UserLogoutQuery {}
+export interface UserLogoutQuery { }
 
 export interface UserMeQuery {
 }
 
-export interface UserAuthResponse {
+export interface UserListQuery extends PageableListQuery, SortableListQuery, SearcheableListQuery {
+    id?: User["id"][]
+    banned?: boolean
 }
 
-export interface UserMeResponse extends User {
+export interface UserQuery {
+    id: User["id"]
 }
+
+export interface UserUpdateQuery extends User, CSRFMiddlewareTokenQueryFormMixin { }
+
+export interface UserDeleteQuery extends CSRFMiddlewareTokenQueryFormMixin {
+    id: User["id"]
+}
+
+// Ответы
+export interface UserAuthResponse { }
+
+export interface UserMeResponse extends UserMe { }
+
+export interface UserListResponse extends PageableListResponse<User> { }
+
+export interface UserResponse extends User { }
+
+export interface UserUpdateResponse extends User { }
+
+export type UserDeleteResponse = {}

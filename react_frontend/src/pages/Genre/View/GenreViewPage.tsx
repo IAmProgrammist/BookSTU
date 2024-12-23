@@ -12,6 +12,7 @@ import { usePermissions } from "hooks/usePermissions";
 import { ENV_API_SERVER } from "envconsts";
 import NoPhotographyIcon from '@mui/icons-material/NoPhotography';
 import { SP_ROOT } from "hooks/SearchParamsFilter";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 export function GenreViewPage() {
     const { genreId } = useParams();
@@ -60,11 +61,12 @@ export function GenreViewPage() {
         return permissionsIsSuccess && permissions.findIndex((item) => item === "django_backend.change_genre") !== -1;
     }, [permissions, permissionsIsSuccess]);
 
-    const {description = "", ...shortGenre} = (data as Genre) || {};
+    const { description = "", ...shortGenre } = (data as Genre) || {};
 
     return <Container sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", gap: 3 }}>
         <Box sx={{ width: "100%", display: "flex" }}>
             <Box sx={{ flexGrow: 1, display: "flex", gap: 1 }}>
+                <Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/genres")}>К жанрам</Button>
             </Box>
             <Box sx={{ display: "flex", gap: 1 }}>
                 {shouldShowUpdate && <Button onClick={() => navigate(`/genres/${genreId}/update`)}>Обновить</Button>}
@@ -110,7 +112,7 @@ export function GenreViewPage() {
                 </CardActionArea>
             </Card>)}
         </Box>
-        {!!booksData?.results?.length ? <Link href={`/book-descriptions?${SP_ROOT}=${encodeURIComponent(JSON.stringify({genres: [shortGenre]}))}`}>Мне нужно больше книг!</Link> : null}
+        {!!booksData?.results?.length ? <Link href={`/book-descriptions?${SP_ROOT}=${encodeURIComponent(JSON.stringify({ genres: [shortGenre] }))}`}>Мне нужно больше книг!</Link> : null}
         <ConfirmationDialog
             id="genre-delete"
             keepMounted
