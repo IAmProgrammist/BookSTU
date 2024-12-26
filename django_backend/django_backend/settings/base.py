@@ -150,8 +150,8 @@ REST_FRAMEWORK = {
 
 SWAGGER_SETTINGS = {
     'USE_SESSION_AUTH': True,
-    'LOGIN_URL': "http://localhost/login",
-    'LOGOUT_URL':"http://localhost/logout",
+    'LOGIN_URL': "http://82.97.246.215/login",
+    'LOGOUT_URL':"http://82.97.246.215/api/logout",
 }
 
 import sentry_sdk
