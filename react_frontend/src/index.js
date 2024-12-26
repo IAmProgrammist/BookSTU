@@ -4,6 +4,10 @@ import reportWebVitals from './reportWebVitals';
 import {Provider} from 'react-redux';
 import { App } from "./App"
 import {store} from './redux/store';
+import * as Sentry from "@sentry/browser";
+import { SENTRY_DSN } from "envconsts";
+
+Sentry.init({ dsn: SENTRY_DSN });
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
