@@ -45,7 +45,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "corsheaders",
     "rest_framework",
-    "django_backend.apps.BookSTUConfig"
+    "django_backend.apps.BookSTUConfig",
+    "drf_yasg",
+    "sentry_sdk"
 ]
 
 MIDDLEWARE = [
@@ -60,6 +62,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'django_backend.urls'
+
+TEMPLATE_LOADERS = (
+'django.template.loaders.eggs.Loader',
+)
 
 TEMPLATES = [
     {
@@ -141,3 +147,19 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100
 }
+
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': True,
+    'LOGIN_URL': "http://82.97.246.215/login",
+    'LOGOUT_URL':"http://82.97.246.215/api/logout",
+}
+
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+ 
+sentry_sdk.init(
+    dsn="https://e293f045a5cf46e4a05faa1558ea8db2@app.glitchtip.com/9663",
+    integrations=[DjangoIntegration()],
+    auto_session_tracking=False,
+    traces_sample_rate=0
+)
