@@ -62,7 +62,6 @@ jobs:
           touch ~/.ssh/id_rsa
           echo -e "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 700 ~/.ssh/id_rsa
-          ssh-keyscan -H 82.97.246.215 >> ~/.ssh/known_hosts
       - name: Run Ansible Script
         shell: bash
         env:
