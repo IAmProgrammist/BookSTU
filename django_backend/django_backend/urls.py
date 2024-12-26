@@ -23,6 +23,8 @@ from django.conf.urls.static import static
 from django_backend.views.user import urlpatterns as user_urlpatterns
 from django_backend.views.file import urlpatterns as file_urlpatterns
 from rest_framework.routers import DefaultRouter, SimpleRouter
+from django_backend.swagger.swagger import schema_view
+
 router = DefaultRouter()
 
 from django_backend.views.genre import (
@@ -65,5 +67,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     *user_urlpatterns,
     *file_urlpatterns,
-    path('api/', include(router.urls))
+    path('api/', include(router.urls)),
+    path('api/swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
