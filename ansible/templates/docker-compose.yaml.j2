@@ -38,13 +38,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    entrypoint: >
-      sh -c 'echo "Creating initial backup..." &&
-             pg_dump -U $$POSTGRES_USER -d $$POSTGRES_DB -Fc -b -v -f /backups/backup_$$(date +%Y-%m-%d_%H-%M-%S).dump &&
-             echo "Setting up cron for scheduled backups..." &&
-             echo "0 2 * * * pg_dump -U $$POSTGRES_USER -d $$POSTGRES_DB -Fc -b -v -f /backups/backup_$$(date +\%Y-\%m-\%d_\%H-\%M-\%S).dump" > /etc/cron.d/db-backup &&
-             chmod 0644 /etc/cron.d/db-backup &&
-             crond -f'
+    entrypoint: ["sh", "-c", "while true; do /backup.sh; sleep 86400; done"]
 
   frontend:
     image: ghcr.io/iamprogrammist/bookstu/frontend:latest
