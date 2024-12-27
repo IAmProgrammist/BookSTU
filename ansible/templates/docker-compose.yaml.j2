@@ -6,6 +6,7 @@ services:
     volumes:
       - django_static_volume:/usr/src/app/static
       - django_media_volume:/usr/src/app/media
+      - django_volume:/usr/src/app
     hostname: backend
     expose:
       - 8000
@@ -40,6 +41,17 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     entrypoint: ["sh", "-c", "while true; do /backup.sh; sleep 86400; done"]
 
+  db_migrate
+    image: postgres:13-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - django_volume:/usr/src/app
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    entrypoint: ["sh", "-c", "python3 manage.py migrate"]
+
   frontend:
     image: ghcr.io/iamprogrammist/bookstu/frontend:latest
     volumes:
@@ -70,3 +82,4 @@ volumes:
   django_static_volume:
   django_media_volume:
   react_static_volume:
+  django_volume:
