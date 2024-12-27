@@ -44,7 +44,7 @@ services:
              echo "Setting up cron for scheduled backups..." &&
              echo "0 2 * * * pg_dump -U $$POSTGRES_USER -d $$POSTGRES_DB -Fc -b -v -f /backups/backup_$$(date +\%Y-\%m-\%d_\%H-\%M-\%S).dump" > /etc/cron.d/db-backup &&
              chmod 0644 /etc/cron.d/db-backup &&
-             cron -f'
+             crond -f'
     restart: unless-stopped
 
   frontend:
