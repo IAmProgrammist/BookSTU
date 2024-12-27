@@ -1,7 +1,7 @@
 - name: deploy
   hosts: all
   tasks:
-    - name: Ensure ansible user is in the Docker group
+    - name: Ensure ansible user is in the docker group
       ansible.builtin.user:
         name: "{{ ansible_user }}"
         groups: docker
